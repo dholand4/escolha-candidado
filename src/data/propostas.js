@@ -18,9 +18,9 @@ export const CANDIDATOS = {
     cor: '#f43f5e',
     corFinal: '#fb923c',
     gradiente: 'from-rose-500 to-orange-400',
-    texto: 'text-rose-300',
-    borda: 'border-rose-400/40',
-    fundo: 'bg-rose-500/15',
+    texto: 'text-rose-600',
+    borda: 'border-rose-300',
+    fundo: 'bg-rose-50',
   },
   flavio: {
     id: 'flavio',
@@ -32,9 +32,9 @@ export const CANDIDATOS = {
     cor: '#38bdf8',
     corFinal: '#6366f1',
     gradiente: 'from-sky-400 to-indigo-500',
-    texto: 'text-sky-300',
-    borda: 'border-sky-400/40',
-    fundo: 'bg-sky-500/15',
+    texto: 'text-sky-600',
+    borda: 'border-sky-300',
+    fundo: 'bg-sky-50',
   },
 }
 

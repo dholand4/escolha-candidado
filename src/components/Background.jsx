@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 
 const BLOBS = [
-  { className: 'left-[-10%] top-[-10%] h-[28rem] w-[28rem] bg-slate-300/10', x: [0, 60, 0], y: [0, 40, 0], duration: 18 },
-  { className: 'right-[-15%] top-[20%] h-[32rem] w-[32rem] bg-zinc-400/10', x: [0, -50, 0], y: [0, 60, 0], duration: 22 },
-  { className: 'bottom-[-20%] left-[20%] h-[30rem] w-[30rem] bg-slate-500/10', x: [0, 40, 0], y: [0, -50, 0], duration: 26 },
+  { className: 'left-[-10%] top-[-10%] h-[28rem] w-[28rem] bg-white/70', x: [0, 60, 0], y: [0, 40, 0], duration: 18 },
+  { className: 'right-[-15%] top-[20%] h-[32rem] w-[32rem] bg-slate-200/60', x: [0, -50, 0], y: [0, 60, 0], duration: 22 },
+  { className: 'bottom-[-20%] left-[20%] h-[30rem] w-[30rem] bg-zinc-200/60', x: [0, 40, 0], y: [0, -50, 0], duration: 26 },
 ]
 
 // Dígitos soltos, como teclas da urna, espalhados longe uns dos outros para nunca formarem um número de partido.
@@ -33,14 +33,14 @@ export default function Background() {
       {DIGITOS.map(({ d, className, duration }) => (
         <motion.span
           key={d}
-          className={`absolute select-none font-display font-bold text-white/[0.035] ${className}`}
+          className={`absolute select-none font-display font-bold text-slate-900/[0.04] ${className}`}
           animate={{ y: [0, -18, 0], rotate: [0, 3, 0] }}
           transition={{ duration, repeat: Infinity, ease: 'easeInOut' }}
         >
           {d}
         </motion.span>
       ))}
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300/50 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
     </div>
   )
 }

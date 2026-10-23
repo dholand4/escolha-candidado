@@ -29,7 +29,7 @@ A pasta `dist/` pode ser publicada em qualquer hospedagem estática (GitHub Page
 - **Prévia do link:** metatags Open Graph com `public/og.png`, apontando para `https://escolha-candidado.vercel.app`. Se o domínio mudar, atualize as URLs em `index.html`.
 - **Offline:** `public/sw.js` guarda o app depois da primeira visita, e ele pode ser instalado na tela inicial do celular.
 - **Visitas:** Vercel Web Analytics, sem cookies, conta visitas e o evento `teste_concluido` (só o modo do teste). Precisa ser ativado no painel da Vercel em *Analytics*; eventos personalizados exigem plano pago.
-- **Urna:** a votação tem o visual de uma urna eletrônica (cinza-claro, visor e teclado). As teclas 1 a 5 votam, BRANCO vale neutro, CORRIGE volta à pergunta anterior e CONFIRMA mantém o voto já dado. Cada tecla faz um bipe e o fim do teste toca uma sequência que lembra o encerramento da votação, com a tela "FIM". Os sons são gerados no navegador (`src/lib/som.js`) e podem ser desligados no ícone de alto-falante.
+- **Estilo urna:** tema claro, com teclas inspiradas na urna eletrônica: 1 a 5 votam, BRANCO vale neutro, CORRIGE volta à pergunta anterior e CONFIRMA mantém o voto já dado. Cada tecla faz um bipe e o fim do teste toca uma sequência que lembra o encerramento da votação, com a tela "FIM". Os sons são gerados no navegador (`src/lib/som.js`) e podem ser desligados no ícone de alto-falante.
 - **Neutralidade visual:** paleta em cinza e prata, sem cores associadas a candidatos; os números decorativos do fundo não formam números de partido.
 - **Atalhos:** teclas 1–5 votam; B é branco; Enter confirma; ← ou Backspace corrigem.
 

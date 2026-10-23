@@ -13,8 +13,7 @@ const variantesCard = {
   sair: (direcao) => ({ opacity: 0, x: direcao * -40 }),
 }
 
-// Teclado da urna: 1 a 5 votam; 6 a 9 e 0 ficam só de enfeite, como numa urna de verdade.
-const TECLAS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
+// Teclas 1 a 5 votam, como no teclado numérico da urna.
 const VALOR_DA_TECLA = Object.fromEntries(OPCOES.map((o, i) => [String(i + 1), o.valor]))
 
 const VOZ_DISPONIVEL = typeof window !== 'undefined' && 'speechSynthesis' in window
@@ -48,7 +47,7 @@ const estiloAcao = (ativo, cor) =>
     ativo ? cor : 'border-slate-300 bg-white/80 text-slate-700 hover:bg-white'
   }`
 
-// Conteúdo do visor da urna: a proposta, o glossário, a versão simples e o voto já dado.
+// Conteúdo do cartão da proposta: o texto, o glossário, a versão simples e o voto já dado.
 function Visor({ proposta, numero, total, voto, simples, onAlternarSimples }) {
   const [termo, setTermo] = useState(null)
   const { falando, alternar: alternarLeitura } = useLeitura()
@@ -61,11 +60,11 @@ function Visor({ proposta, numero, total, voto, simples, onAlternarSimples }) {
         </span>
       </div>
       <div className="mt-2 flex items-center gap-2">
-        <CategoriaTag categoria={proposta.categoria} clara />
+        <CategoriaTag categoria={proposta.categoria} />
       </div>
       <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">Um candidato propõe:</p>
       <h2 className="mt-1.5 font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl">
-        <TextoComGlossario texto={proposta.texto} termoAtivo={termo?.termo} onEscolherTermo={setTermo} claro />
+        <TextoComGlossario texto={proposta.texto} termoAtivo={termo?.termo} onEscolherTermo={setTermo} />
       </h2>
 
       <AnimatePresence initial={false}>
@@ -240,8 +239,8 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
     <div className="flex flex-1 flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
         <div>
-          <p className="font-display text-sm font-semibold text-white">Match Eleitoral 2026</p>
-          <p className="text-xs text-slate-400">{MODOS[modo].titulo} · teste cego</p>
+          <p className="font-display text-sm font-semibold text-slate-900">Match Eleitoral 2026</p>
+          <p className="text-xs text-slate-500">{MODOS[modo].titulo} · teste cego</p>
         </div>
         <div className="flex items-center gap-1">
           <button
@@ -250,14 +249,14 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
             aria-pressed={som}
             aria-label={som ? 'Desligar som das teclas' : 'Ligar som das teclas'}
             title={som ? 'Desligar som' : 'Ligar som'}
-            className="rounded-full p-2 text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+            className="rounded-full p-2 text-slate-500 transition-colors hover:bg-slate-900/5 hover:text-slate-900"
           >
             {som ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
           </button>
           <button
             type="button"
             onClick={onRecomecar}
-            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-500 transition-colors hover:bg-slate-900/5 hover:text-slate-900"
           >
             <RotateCcw className="h-3.5 w-3.5" /> Recomeçar do zero
           </button>
@@ -265,15 +264,15 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
       </header>
 
       <div>
-        <div className="mb-2 flex items-center justify-between text-xs text-slate-400">
+        <div className="mb-2 flex items-center justify-between text-xs text-slate-500">
           <span>
-            Pergunta <span className="font-semibold text-white">{atual + 1}</span> de {ordem.length}
+            Pergunta <span className="font-semibold text-slate-900">{atual + 1}</span> de {ordem.length}
           </span>
           <span>{Math.round(progresso)}% respondido</span>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-white/[0.08]">
+        <div className="h-2 overflow-hidden rounded-full bg-slate-200">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-slate-300 to-white shadow-[0_0_12px_rgba(255,255,255,0.45)]"
+            className="h-full rounded-full bg-gradient-to-r from-slate-500 to-slate-800"
             initial={false}
             animate={{ width: `${progresso}%` }}
             transition={{ type: 'spring', stiffness: 120, damping: 20 }}
@@ -287,111 +286,98 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            className="glass flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-slate-100"
+            className="glass flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm text-slate-700"
           >
-            <History className="h-4 w-4 shrink-0 text-slate-300" />
+            <History className="h-4 w-4 shrink-0 text-slate-500" />
             Progresso recuperado! Você continua de onde parou.
           </motion.div>
         )}
       </AnimatePresence>
 
-      <section aria-label="Urna" className="urna-corpo rounded-[28px] p-3 sm:p-4">
-        <div className="grid gap-3 sm:gap-4 md:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-          <div className="urna-visor relative min-h-[22rem] overflow-hidden rounded-2xl p-4 sm:p-5">
-            <AnimatePresence mode="wait" custom={direcao} initial={false}>
-              <motion.div
-                key={proposta.id}
-                custom={direcao}
-                variants={variantesCard}
-                initial="entrar"
-                animate="centro"
-                exit="sair"
-                transition={{ duration: 0.22, ease: 'easeOut' }}
-                className="h-full"
-              >
-                <Visor
-                  proposta={proposta}
-                  numero={atual + 1}
-                  total={ordem.length}
-                  voto={respostaAtual}
-                  simples={simples}
-                  onAlternarSimples={alternarSimples}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
+      <div className="relative">
+        <AnimatePresence mode="wait" custom={direcao} initial={false}>
+          <motion.article
+            key={proposta.id}
+            custom={direcao}
+            variants={variantesCard}
+            initial="entrar"
+            animate="centro"
+            exit="sair"
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="glass-strong min-h-[17rem] rounded-3xl p-5 sm:p-8"
+          >
+            <Visor
+              proposta={proposta}
+              numero={atual + 1}
+              total={ordem.length}
+              voto={respostaAtual}
+              simples={simples}
+              onAlternarSimples={alternarSimples}
+            />
+          </motion.article>
+        </AnimatePresence>
+      </div>
 
-          <div className="urna-teclado flex flex-col rounded-2xl p-3 sm:p-4">
-            <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Match Eleitoral</p>
-            <div className="grid grid-cols-3 gap-2.5">
-              {TECLAS.map((tecla) => {
-                const valor = VALOR_DA_TECLA[tecla]
-                const ativa = valor !== undefined
-                const selecionada = ativa && respostaAtual === valor
-                return (
-                  <button
-                    key={tecla}
-                    type="button"
-                    disabled={!ativa}
-                    aria-hidden={!ativa}
-                    tabIndex={ativa ? 0 : -1}
-                    aria-label={ativa ? `${tecla}: ${ROTULO_VOTO[valor]}` : undefined}
-                    aria-pressed={ativa ? selecionada : undefined}
-                    data-pressionada={pressionada === tecla}
-                    onClick={() => votar(valor, tecla)}
-                    className={`tecla tecla-numero h-14 ${tecla === '0' ? 'col-start-2' : ''} ${
-                      ativa ? 'cursor-pointer' : 'cursor-default opacity-35'
-                    } ${selecionada ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-[#cfcec8]' : ''}`}
-                  >
-                    <span className="text-xl leading-none">{tecla}</span>
-                    {ativa && (
-                      <span className="mt-1 px-1 text-center font-sans text-[9px] font-medium leading-tight text-slate-300 sm:text-[10px]">
-                        {ROTULO_VOTO[valor]}
-                      </span>
-                    )}
-                  </button>
-                )
-              })}
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2.5">
-              <button
-                type="button"
-                onClick={() => votar(0, 'branco')}
-                aria-label="Branco: Neutro"
-                data-pressionada={pressionada === 'branco'}
-                className={`tecla tecla-branco h-14 cursor-pointer ${respostaAtual === 0 ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-[#cfcec8]' : ''}`}
-              >
-                <span className="text-[11px] tracking-wide">BRANCO</span>
-                <span className="font-sans text-[9px] font-medium text-slate-500">neutro</span>
-              </button>
-              <button
-                type="button"
-                onClick={corrigir}
-                disabled={atual === 0}
-                aria-label="Corrige: voltar à pergunta anterior"
-                data-pressionada={pressionada === 'corrige'}
-                className="tecla tecla-corrige h-14 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <span className="text-[11px] tracking-wide">CORRIGE</span>
-                <span className="font-sans text-[9px] font-medium text-slate-900/70">voltar</span>
-              </button>
-              <button
-                type="button"
-                onClick={confirmar}
-                disabled={respostaAtual === undefined}
-                aria-label="Confirma: manter o voto e seguir"
-                data-pressionada={pressionada === 'confirma'}
-                className="tecla tecla-confirma h-16 -mt-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <span className="text-[11px] tracking-wide">CONFIRMA</span>
-                <span className="font-sans text-[9px] font-medium text-white/80">manter</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-5">
+        {OPCOES.map(({ valor, rotulo }, i) => {
+          const tecla = String(i + 1)
+          const selecionada = respostaAtual === valor
+          return (
+            <button
+              key={tecla}
+              type="button"
+              onClick={() => votar(valor, tecla)}
+              aria-label={`${tecla}: ${rotulo}`}
+              aria-pressed={selecionada}
+              data-pressionada={pressionada === tecla}
+              className={`tecla tecla-numero cursor-pointer gap-3 px-4 py-3 text-left sm:flex-col sm:justify-center sm:gap-1 sm:px-2 sm:py-4 sm:text-center ${
+                selecionada ? 'ring-2 ring-slate-900 ring-offset-2 ring-offset-[#f4f4f1]' : ''
+              }`}
+            >
+              <span className="w-6 text-2xl leading-none sm:w-auto">{tecla}</span>
+              <span className="flex-1 font-sans text-sm font-semibold leading-tight text-slate-700 sm:flex-none sm:text-xs">{rotulo}</span>
+              <span className="font-mono text-xs font-normal text-slate-400 sm:hidden">{valor > 0 ? `+${valor}` : valor}</span>
+            </button>
+          )
+        })}
+      </div>
 
-      <p className="hidden text-center text-xs text-slate-500 sm:block">
+      <div className="grid grid-cols-3 gap-2.5">
+        <button
+          type="button"
+          onClick={() => votar(0, 'branco')}
+          aria-label="Branco: Neutro"
+          data-pressionada={pressionada === 'branco'}
+          className="tecla tecla-branco cursor-pointer flex-col justify-center py-3"
+        >
+          <span className="text-sm tracking-wider">BRANCO</span>
+          <span className="font-sans text-[11px] font-medium text-slate-500">neutro</span>
+        </button>
+        <button
+          type="button"
+          onClick={corrigir}
+          disabled={atual === 0}
+          aria-label="Corrige: voltar à pergunta anterior"
+          data-pressionada={pressionada === 'corrige'}
+          className="tecla tecla-corrige cursor-pointer flex-col justify-center py-3 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <span className="text-sm tracking-wider">CORRIGE</span>
+          <span className="font-sans text-[11px] font-medium text-slate-900/70">voltar</span>
+        </button>
+        <button
+          type="button"
+          onClick={confirmar}
+          disabled={respostaAtual === undefined}
+          aria-label="Confirma: manter o voto e seguir"
+          data-pressionada={pressionada === 'confirma'}
+          className="tecla tecla-confirma cursor-pointer flex-col justify-center py-3 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          <span className="text-sm tracking-wider">CONFIRMA</span>
+          <span className="font-sans text-[11px] font-medium text-white/85">manter</span>
+        </button>
+      </div>
+
+      <p className="hidden text-center text-xs text-slate-400 sm:block">
         No computador: teclas 1–5 votam · B branco · Enter confirma · ← corrige
       </p>
     </div>

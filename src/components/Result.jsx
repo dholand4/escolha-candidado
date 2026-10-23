@@ -25,7 +25,7 @@ import CategoriaTag from './CategoriaTag.jsx'
 function Barra({ pct, candidato, atraso = 0, grossa = false }) {
   const c = CANDIDATOS[candidato]
   return (
-    <div className={`overflow-hidden rounded-full bg-white/[0.06] ${grossa ? 'h-4' : 'h-2.5'}`}>
+    <div className={`overflow-hidden rounded-full bg-slate-200 ${grossa ? 'h-4' : 'h-2.5'}`}>
       <motion.div
         className={`h-full rounded-full bg-gradient-to-r ${c.gradiente}`}
         style={{ boxShadow: `0 0 18px ${c.cor}80` }}
@@ -39,7 +39,7 @@ function Barra({ pct, candidato, atraso = 0, grossa = false }) {
 
 function CorVoto({ voto }) {
   if (voto === undefined) return <span className="text-slate-500">Sem resposta</span>
-  const classe = voto > 0 ? 'text-emerald-300' : voto < 0 ? 'text-rose-300' : 'text-slate-300'
+  const classe = voto > 0 ? 'text-emerald-700' : voto < 0 ? 'text-rose-700' : 'text-slate-600'
   return (
     <span className={classe}>
       {ROTULO_VOTO[voto]} <span className="font-mono opacity-60">({voto > 0 ? `+${voto}` : voto})</span>
@@ -79,8 +79,8 @@ function Compartilhar({ resultado }) {
 
   return (
     <section className="glass-strong rounded-3xl p-5 sm:p-7">
-      <h2 className="font-display text-lg font-semibold text-white">Compartilhe seu resultado</h2>
-      <p className="mt-1 text-sm text-slate-400">
+      <h2 className="font-display text-lg font-semibold text-slate-900">Compartilhe seu resultado</h2>
+      <p className="mt-1 text-sm text-slate-500">
         A imagem mostra só as porcentagens e os temas, nunca as suas respostas.
       </p>
       <div className="mt-4 flex flex-col gap-2 sm:flex-row">
@@ -97,20 +97,20 @@ function Compartilhar({ resultado }) {
           href={whatsapp}
           target="_blank"
           rel="noreferrer"
-          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-emerald-200 transition-colors hover:bg-white/10"
+          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-emerald-700 transition-colors hover:bg-slate-100"
         >
           <Share2 className="h-4 w-4" /> Enviar no WhatsApp
         </a>
         <button
           type="button"
           onClick={copiar}
-          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-slate-100 transition-colors hover:bg-white/10"
+          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100"
         >
           {estado === 'copiado' ? <Check className="h-4 w-4" /> : <Link2 className="h-4 w-4" />} Copiar texto
         </button>
       </div>
       {aviso && (
-        <p role="status" className="mt-3 text-xs text-slate-300">
+        <p role="status" className="mt-3 text-xs text-slate-600">
           {aviso}
         </p>
       )}
@@ -127,9 +127,9 @@ function ListaDestaques({ titulo, icone: Icone, classe, itens }) {
       {itens.length ? (
         <ul className="mt-2 space-y-2">
           {itens.map(({ proposta, voto }) => (
-            <li key={proposta.id} className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm leading-snug text-slate-200">
+            <li key={proposta.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm leading-snug text-slate-700">
               {proposta.texto}
-              <span className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
+              <span className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-500">
                 <CorVoto voto={voto} />
               </span>
             </li>
@@ -148,23 +148,23 @@ function ItemGabarito({ proposta, numero, voto }) {
   const c = CANDIDATOS[proposta.candidato]
   const trechos = [proposta.trecho].flat()
   return (
-    <li className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+    <li className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-xs text-slate-500">#{String(numero).padStart(2, '0')}</span>
         <CategoriaTag categoria={proposta.categoria} pequena />
         <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${c.borda} ${c.fundo} ${c.texto}`}>{c.nome}</span>
       </div>
-      <p className="mt-2 text-sm leading-relaxed text-slate-200">{proposta.texto}</p>
-      <p className="mt-1.5 text-xs text-slate-400">
+      <p className="mt-2 text-sm leading-relaxed text-slate-700">{proposta.texto}</p>
+      <p className="mt-1.5 text-xs text-slate-500">
         Seu voto: <CorVoto voto={voto} />
       </p>
       <button
         type="button"
         onClick={() => setAberto((v) => !v)}
         aria-expanded={aberto}
-        className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-white/10"
+        className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-700 transition-colors hover:bg-slate-100"
       >
-        <FileText className="h-3.5 w-3.5 text-slate-300" />
+        <FileText className="h-3.5 w-3.5 text-slate-600" />
         {aberto ? 'Esconder trecho' : 'Ver trecho no plano'}
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${aberto ? 'rotate-180' : ''}`} />
       </button>
@@ -177,15 +177,15 @@ function ItemGabarito({ proposta, numero, voto }) {
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <figure className={`mt-3 rounded-xl border-l-2 ${c.borda} bg-white/[0.03] px-4 py-3`}>
-              <blockquote className="space-y-1 font-serif text-sm italic leading-relaxed text-slate-200">
+            <figure className={`mt-3 rounded-xl border-l-2 ${c.borda} bg-slate-50 px-4 py-3`}>
+              <blockquote className="space-y-1 font-serif text-sm italic leading-relaxed text-slate-700">
                 {trechos.map((t, i) => (
                   <p key={i}>
                     “{t}”{i < trechos.length - 1 && <span className="not-italic text-slate-500"> […]</span>}
                   </p>
                 ))}
               </blockquote>
-              <figcaption className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+              <figcaption className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500">
                 <span>
                   {c.plano} · {c.nome} · pág. {proposta.pagina}
                 </span>
@@ -193,7 +193,7 @@ function ItemGabarito({ proposta, numero, voto }) {
                   href={linkPagina(proposta)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-slate-100 underline decoration-slate-500 underline-offset-2 hover:text-white"
+                  className="inline-flex items-center gap-1 font-medium text-slate-800 underline decoration-slate-400 underline-offset-2 hover:text-slate-900"
                 >
                   Abrir o PDF na pág. {proposta.pagina} <ExternalLink className="h-3 w-3" />
                 </a>
@@ -220,11 +220,11 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex items-center justify-between gap-3">
-        <p className="font-display text-sm font-semibold text-white">Match Eleitoral 2026</p>
+        <p className="font-display text-sm font-semibold text-slate-900">Match Eleitoral 2026</p>
         <button
           type="button"
           onClick={onRecomecar}
-          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+          className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-slate-500 transition-colors hover:bg-slate-900/5 hover:text-slate-900"
         >
           <RotateCcw className="h-3.5 w-3.5" /> Recomeçar do zero
         </button>
@@ -244,9 +244,9 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
           >
             {vencedor ? <Trophy className="h-6 w-6" /> : <Scale className="h-6 w-6" />}
           </motion.div>
-          <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Seu resultado</p>
-          <h1 className="mt-2 font-display text-2xl font-bold leading-tight text-white sm:text-4xl">{manchete}</h1>
-          <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
+          <p className="mt-4 text-xs font-medium uppercase tracking-[0.2em] text-slate-500">Seu resultado</p>
+          <h1 className="mt-2 font-display text-2xl font-bold leading-tight text-slate-900 sm:text-4xl">{manchete}</h1>
+          <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
             Afinidade de 0% (discordou totalmente de tudo) a 100% (concordou totalmente com tudo). 50% equivale a neutro.
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.6 + i * 0.15 }}
-                    className="font-display text-3xl font-bold text-white sm:text-4xl"
+                    className="font-display text-3xl font-bold text-slate-900 sm:text-4xl"
                   >
                     {a.pct}%
                   </motion.span>
@@ -283,9 +283,9 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
       <Compartilhar resultado={resultado} />
 
       <section className="glass rounded-3xl p-5 sm:p-7">
-        <h2 className="font-display text-lg font-semibold text-white">Afinidade por tema</h2>
-        <p className="mt-1 text-sm text-slate-400">Como suas respostas se distribuem em cada área.</p>
-        <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-400">
+        <h2 className="font-display text-lg font-semibold text-slate-900">Afinidade por tema</h2>
+        <p className="mt-1 text-sm text-slate-500">Como suas respostas se distribuem em cada área.</p>
+        <div className="mt-4 flex flex-wrap gap-4 text-xs text-slate-500">
           {ranking.map((id) => (
             <span key={id} className="inline-flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ background: CANDIDATOS[id].cor }} />
@@ -307,11 +307,11 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * i }}
-                className="rounded-2xl border border-white/5 bg-white/[0.02] p-4"
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4"
               >
                 <div className="flex items-center justify-between gap-2">
                   <CategoriaTag categoria={categoria} pequena />
-                  <span className={`text-right text-[11px] font-medium ${lider ? CANDIDATOS[lider].texto : 'text-slate-400'}`}>
+                  <span className={`text-right text-[11px] font-medium ${lider ? CANDIDATOS[lider].texto : 'text-slate-500'}`}>
                     {rotulo}
                   </span>
                 </div>
@@ -323,7 +323,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
                         <div className="flex-1">
                           <Barra pct={pct} candidato={id} atraso={0.3 + 0.05 * i} />
                         </div>
-                        <span className="w-12 text-right font-mono text-xs text-slate-300">
+                        <span className="w-12 text-right font-mono text-xs text-slate-600">
                           {quantidade ? `${pct}%` : '—'}
                         </span>
                       </div>
@@ -337,17 +337,17 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
       </section>
 
       <section className="glass rounded-3xl p-5 sm:p-7">
-        <h2 className="font-display text-lg font-semibold text-white">Onde você concorda e diverge</h2>
-        <p className="mt-1 text-sm text-slate-400">As propostas de cada candidato que você mais apoiou e mais rejeitou.</p>
+        <h2 className="font-display text-lg font-semibold text-slate-900">Onde você concorda e diverge</h2>
+        <p className="mt-1 text-sm text-slate-500">As propostas de cada candidato que você mais apoiou e mais rejeitou.</p>
         <div className="mt-5 grid gap-6 sm:grid-cols-2">
           {ranking.map((id) => {
             const c = CANDIDATOS[id]
             return (
-              <div key={id} className={`rounded-2xl border ${c.borda} bg-white/[0.02] p-4`}>
+              <div key={id} className={`rounded-2xl border ${c.borda} bg-slate-50 p-4`}>
                 <p className={`font-display font-semibold ${c.texto}`}>{c.nome}</p>
                 <div className="mt-3 space-y-4">
-                  <ListaDestaques titulo="Você mais apoiou" icone={ThumbsUp} classe="text-emerald-300" itens={destaques[id].concorda} />
-                  <ListaDestaques titulo="Você mais rejeitou" icone={ThumbsDown} classe="text-rose-300" itens={destaques[id].discorda} />
+                  <ListaDestaques titulo="Você mais apoiou" icone={ThumbsUp} classe="text-emerald-700" itens={destaques[id].concorda} />
+                  <ListaDestaques titulo="Você mais rejeitou" icone={ThumbsDown} classe="text-rose-700" itens={destaques[id].discorda} />
                 </div>
               </div>
             )
@@ -360,17 +360,17 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
           type="button"
           onClick={() => setGabaritoAberto((v) => !v)}
           aria-expanded={gabaritoAberto}
-          className="flex w-full items-center justify-between gap-3 p-5 text-left transition-colors hover:bg-white/[0.03] sm:p-7"
+          className="flex w-full items-center justify-between gap-3 p-5 text-left transition-colors hover:bg-slate-50 sm:p-7"
         >
           <span className="flex items-center gap-3">
-            <BookOpen className="h-5 w-5 text-slate-300" />
+            <BookOpen className="h-5 w-5 text-slate-600" />
             <span>
-              <span className="block font-display text-lg font-semibold text-white">Gabarito</span>
-              <span className="block text-sm text-slate-400">De quem era cada proposta, como você votou e o trecho do plano</span>
+              <span className="block font-display text-lg font-semibold text-slate-900">Gabarito</span>
+              <span className="block text-sm text-slate-500">De quem era cada proposta, como você votou e o trecho do plano</span>
             </span>
           </span>
           <motion.span animate={{ rotate: gabaritoAberto ? 180 : 0 }}>
-            <ChevronDown className="h-5 w-5 text-slate-400" />
+            <ChevronDown className="h-5 w-5 text-slate-500" />
           </motion.span>
         </button>
         <AnimatePresence initial={false}>
@@ -381,7 +381,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.35, ease: 'easeInOut' }}
             >
-              <ol className="space-y-2 border-t border-white/5 p-3 sm:p-5">
+              <ol className="space-y-2 border-t border-slate-200 p-3 sm:p-5">
                 {estado.ordem.map((id, i) => (
                   <ItemGabarito key={id} proposta={PROPOSTAS_POR_ID[id]} numero={i + 1} voto={estado.respostas[id]} />
                 ))}
@@ -395,21 +395,21 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
         <button
           type="button"
           onClick={onRevisar}
-          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium text-slate-100 transition-colors hover:bg-white/10"
+          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100"
         >
           <PencilLine className="h-4 w-4" /> Revisar minhas respostas
         </button>
         <button
           type="button"
           onClick={onRecomecar}
-          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium text-slate-100 transition-colors hover:bg-white/10"
+          className="glass inline-flex flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-medium text-slate-800 transition-colors hover:bg-slate-100"
         >
           <RotateCcw className="h-4 w-4" /> Fazer o teste de novo
         </button>
       </div>
 
       <section className="text-xs leading-relaxed text-slate-500">
-        <p className="font-medium text-slate-400">Sobre as propostas</p>
+        <p className="font-medium text-slate-500">Sobre as propostas</p>
         <p className="mt-1">
           Cada proposta foi tirada dos planos de governo registrados no TSE e reescrita de forma neutra; no gabarito
           você vê o trecho original e a página. Ideias que aparecem nos dois planos ficaram de fora. O teste é um
@@ -418,13 +418,13 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
         <ul className="mt-2 space-y-1">
           {ranking.map((id) => (
             <li key={id}>
-              <a href={CANDIDATOS[id].pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white">
+              <a href={CANDIDATOS[id].pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-slate-900">
                 {CANDIDATOS[id].nome}: {CANDIDATOS[id].plano} (PDF) <ExternalLink className="h-3 w-3" />
               </a>
             </li>
           ))}
           <li>
-            <a href={TSE_PLANOS} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white">
+            <a href={TSE_PLANOS} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-slate-900">
               Página oficial dos planos no TSE <ExternalLink className="h-3 w-3" />
             </a>
           </li>

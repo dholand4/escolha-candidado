@@ -89,7 +89,7 @@ export default function App() {
             {tela === 'resultado' && <Result estado={estado} onRevisar={revisar} onRecomecar={recomecar} />}
           </motion.div>
         </AnimatePresence>
-        <footer className="mt-10 text-center text-[11px] leading-relaxed text-slate-500">
+        <footer className="mt-10 text-center text-[11px] leading-relaxed text-slate-400">
           Projeto independente e apartidário. Propostas resumidas dos planos de governo registrados no TSE.
           <br />
           Tudo roda no seu navegador: nenhuma resposta é enviada para servidores. Contamos só visitas anônimas, sem cookies.
