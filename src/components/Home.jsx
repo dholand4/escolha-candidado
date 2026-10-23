@@ -1,16 +1,18 @@
 import { motion } from 'framer-motion'
-import { ArrowRight, EyeOff, HardDrive, ListChecks, Scale, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, EyeOff, HardDrive, Lightbulb, ListChecks, Scale, Sparkles, Zap } from 'lucide-react'
+import { PROPOSTAS } from '../data/propostas.js'
 import { MODOS } from '../lib/quiz.js'
 
 const PASSOS = [
   { icone: EyeOff, titulo: 'Teste cego', texto: 'Os autores das propostas ficam ocultos até o final. Você avalia a ideia, não o nome.' },
-  { icone: Scale, titulo: 'Equilibrado', texto: 'Metade das propostas é de cada candidato, em ordem embaralhada.' },
+  { icone: Scale, titulo: 'Sempre diferente', texto: `Metade das propostas é de cada candidato, sorteadas de um banco de ${PROPOSTAS.length}.` },
+  { icone: Lightbulb, titulo: 'Fácil de entender', texto: 'Palavras difíceis vêm sublinhadas com explicação, e cada proposta tem versão em linguagem simples.' },
   { icone: HardDrive, titulo: 'Privado', texto: 'Tudo fica no seu navegador. Se fechar a aba, o progresso continua salvo.' },
 ]
 
 const OPCOES_MODO = [
-  { ...MODOS.rapido, icone: Zap, descricao: '10 propostas de cada candidato', tempo: '~3 min', destaque: 'from-cyan-400 to-sky-500' },
-  { ...MODOS.completo, icone: ListChecks, descricao: 'Todas as 50 propostas', tempo: '~8 min', destaque: 'from-violet-400 to-fuchsia-500' },
+  { ...MODOS.rapido, icone: Zap, descricao: '10 de cada candidato', tempo: '~3 min', destaque: 'from-cyan-400 to-sky-500' },
+  { ...MODOS.completo, icone: ListChecks, descricao: '25 de cada candidato', tempo: '~8 min', destaque: 'from-violet-400 to-fuchsia-500' },
 ]
 
 const item = {
@@ -33,7 +35,7 @@ export default function Home({ onIniciar }) {
         </p>
       </motion.div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2">
         {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
           <motion.div key={titulo} custom={i + 1} variants={item} initial="hidden" animate="show" className="glass rounded-2xl p-4">
             <Icone className="h-5 w-5 text-cyan-300" />
@@ -43,7 +45,7 @@ export default function Home({ onIniciar }) {
         ))}
       </div>
 
-      <motion.div custom={4} variants={item} initial="hidden" animate="show">
+      <motion.div custom={5} variants={item} initial="hidden" animate="show">
         <h2 className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Escolha o seu teste</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {OPCOES_MODO.map(({ id, titulo, total, icone: Icone, descricao, tempo, destaque }) => (
@@ -74,7 +76,7 @@ export default function Home({ onIniciar }) {
         </div>
       </motion.div>
 
-      <motion.p custom={5} variants={item} initial="hidden" animate="show" className="text-center text-xs text-slate-500">
+      <motion.p custom={6} variants={item} initial="hidden" animate="show" className="text-center text-xs text-slate-500">
         Escala de resposta: Discordo totalmente (−2) · Discordo (−1) · Neutro (0) · Concordo (+1) · Concordo totalmente (+2)
       </motion.p>
     </div>

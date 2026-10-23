@@ -16,8 +16,9 @@ A pasta `dist/` pode ser publicada em qualquer hospedagem estática (GitHub Page
 
 ## Como funciona
 
-- **50 propostas fixas** em `src/data/propostas.js` (25 de cada candidato), escritas de forma neutra, com categoria e autor.
-- **Teste Rápido (20)** sorteia 10 propostas de cada candidato; **Teste Completo (50)** usa todas. A ordem é sempre embaralhada.
+- **Banco fixo de 100 propostas** em `src/data/propostas.js` (50 de cada candidato), escritas de forma neutra, com categoria, autor e uma versão em linguagem simples. Só entram propostas exclusivas de um candidato: ideias que aparecem nos dois planos ficaram de fora.
+- **Teste Rápido (20)** sorteia 10 propostas de cada candidato; **Teste Completo (50)** sorteia 25 de cada. Cada teste traz propostas e ordem diferentes.
+- **Fácil de entender:** termos técnicos vêm sublinhados (glossário em `src/data/glossario.js`) e mostram a explicação ao passar o mouse ou tocar; o botão "Explicar em linguagem simples" mostra a proposta reescrita de forma leiga.
 - **Escala:** Concordo totalmente +2 · Concordo +1 · Neutro 0 · Discordo −1 · Discordo totalmente −2. Os pontos vão para o autor da proposta.
 - **Afinidade (%)** = `(soma + 2·n) / (4·n)`, onde `n` é o número de propostas do candidato respondidas: 0% = discordou totalmente de tudo, 50% = neutro, 100% = concordou totalmente com tudo. O mesmo cálculo é feito por tema.
 - **Salvamento automático** no `localStorage` (ordem sorteada, pergunta atual e respostas). Um F5 ou fechar a aba não perde o progresso; o botão "Recomeçar do zero" limpa tudo.

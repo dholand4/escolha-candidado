@@ -1,6 +1,8 @@
 import { CANDIDATOS, CATEGORIAS, PROPOSTAS, PROPOSTAS_POR_ID } from '../data/propostas.js'
 
-export const STORAGE_KEY = 'match-eleitoral-2026:v1'
+// v2: banco de 100 propostas com novos ids; progresso salvo da v1 é descartado.
+export const STORAGE_KEY = 'match-eleitoral-2026:v2'
+export const SIMPLES_KEY = 'match-eleitoral-2026:linguagem-simples'
 
 export const OPCOES = [
   { valor: -2, rotulo: 'Discordo totalmente', curto: 'Discordo total.' },
@@ -14,7 +16,7 @@ export const ROTULO_VOTO = Object.fromEntries(OPCOES.map((o) => [o.valor, o.rotu
 
 export const MODOS = {
   rapido: { id: 'rapido', titulo: 'Teste Rápido', total: 20 },
-  completo: { id: 'completo', titulo: 'Teste Completo', total: PROPOSTAS.length },
+  completo: { id: 'completo', titulo: 'Teste Completo', total: 50 },
 }
 
 function embaralhar(lista) {
@@ -26,7 +28,8 @@ function embaralhar(lista) {
   return copia
 }
 
-// No modo rápido, sorteia metade das perguntas de cada candidato para manter o teste equilibrado.
+// Sorteia metade das perguntas de cada candidato a partir do banco, para o teste ficar equilibrado
+// e mudar a cada vez que é refeito.
 export function sortearOrdem(modo) {
   const total = MODOS[modo].total
   const porCandidato = Object.keys(CANDIDATOS).map((c) =>
@@ -67,6 +70,22 @@ export function salvarEstado(estado) {
     else localStorage.removeItem(STORAGE_KEY)
   } catch {
     // Sem armazenamento disponível (aba anônima, bloqueio): o teste segue só em memória.
+  }
+}
+
+export function carregarPreferenciaSimples() {
+  try {
+    return localStorage.getItem(SIMPLES_KEY) === '1'
+  } catch {
+    return false
+  }
+}
+
+export function salvarPreferenciaSimples(ativo) {
+  try {
+    localStorage.setItem(SIMPLES_KEY, ativo ? '1' : '0')
+  } catch {
+    // Preferência só em memória.
   }
 }
 

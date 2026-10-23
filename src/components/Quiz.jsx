@@ -1,9 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowLeft, Check, CheckCheck, History, Minus, RotateCcw, ThumbsDown, ThumbsUp, X } from 'lucide-react'
+import {
+  ArrowLeft,
+  BookOpenText,
+  Check,
+  CheckCheck,
+  History,
+  Lightbulb,
+  Minus,
+  RotateCcw,
+  ThumbsDown,
+  ThumbsUp,
+  X,
+} from 'lucide-react'
 import { PROPOSTAS_POR_ID } from '../data/propostas.js'
-import { MODOS, OPCOES } from '../lib/quiz.js'
+import { MODOS, OPCOES, carregarPreferenciaSimples, salvarPreferenciaSimples } from '../lib/quiz.js'
 import CategoriaTag from './CategoriaTag.jsx'
+import TextoComGlossario from './TextoComGlossario.jsx'
 
 const VISUAL_OPCAO = {
   [-2]: { icone: X, classe: 'border-rose-400/40 bg-rose-500/15 text-rose-100 hover:bg-rose-500/30', ativo: 'ring-rose-300 bg-rose-500/40' },
@@ -19,6 +32,94 @@ const variantesCard = {
   sair: (direcao) => ({ opacity: 0, x: direcao * -60, rotate: direcao * -2, scale: 0.97 }),
 }
 
+function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimples }) {
+  const [termo, setTermo] = useState(null)
+  return (
+    <>
+      <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+        <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
+      </div>
+      <div className="relative flex items-center justify-between gap-2">
+        <CategoriaTag categoria={proposta.categoria} />
+        <span className="font-mono text-xs text-slate-500">#{String(numero).padStart(2, '0')}</span>
+      </div>
+      <p className="relative mt-3 text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Um candidato propõe:</p>
+      <h2 className="relative mt-3 min-h-[6.5rem] font-display text-xl font-semibold leading-snug text-white sm:min-h-[7.5rem] sm:text-3xl sm:leading-snug">
+        <TextoComGlossario texto={proposta.texto} termoAtivo={termo?.termo} onEscolherTermo={setTermo} />
+      </h2>
+
+      <AnimatePresence initial={false}>
+        {termo && (
+          <motion.div
+            key={termo.termo}
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="relative overflow-hidden"
+          >
+            <div className="mt-4 flex gap-2.5 rounded-2xl border border-cyan-300/20 bg-cyan-400/[0.07] p-3 text-sm text-slate-200">
+              <BookOpenText className="mt-0.5 h-4 w-4 shrink-0 text-cyan-300" />
+              <p className="flex-1">
+                <span className="font-semibold text-cyan-200">{termo.termo}:</span> {termo.definicao}
+              </p>
+              <button
+                type="button"
+                onClick={() => setTermo(null)}
+                aria-label="Fechar explicação"
+                className="self-start rounded-full p-0.5 text-slate-400 hover:bg-white/10 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence initial={false}>
+        {simples && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="relative overflow-hidden"
+          >
+            <div className="mt-4 flex gap-2.5 rounded-2xl border border-amber-300/20 bg-amber-400/[0.07] p-3 text-sm leading-relaxed text-amber-50 sm:text-base">
+              <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-amber-300 sm:mt-1" />
+              <p>
+                <span className="font-semibold text-amber-200">Em outras palavras: </span>
+                {proposta.simples}
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="relative mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <button
+          type="button"
+          onClick={onAlternarSimples}
+          aria-pressed={simples}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+            simples
+              ? 'border-amber-300/40 bg-amber-400/15 text-amber-100'
+              : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+          }`}
+        >
+          <Lightbulb className="h-3.5 w-3.5" />
+          {simples ? 'Linguagem simples: ligada' : 'Explicar em linguagem simples'}
+        </button>
+        <span className="text-[11px] text-slate-500">Palavras sublinhadas têm explicação: toque nelas</span>
+      </div>
+
+      {respondida && (
+        <p className="relative mt-3 inline-flex items-center gap-1.5 text-xs text-slate-400">
+          <Check className="h-3.5 w-3.5 text-cyan-300" /> Você já respondeu esta. Escolha de novo para alterar.
+        </p>
+      )}
+    </>
+  )
+}
+
 export default function Quiz({ estado, restaurado, onResponder, onVoltar, onRecomecar }) {
   const { ordem, atual, respostas, modo } = estado
   const proposta = PROPOSTAS_POR_ID[ordem[atual]]
@@ -27,6 +128,7 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
   const progresso = (respondidas / ordem.length) * 100
 
   const [direcao, setDirecao] = useState(1)
+  const [simples, setSimples] = useState(carregarPreferenciaSimples)
   const [avisoRestaurado, setAvisoRestaurado] = useState(restaurado && (atual > 0 || respondidas > 0))
   const bloqueado = useRef(false)
 
@@ -47,6 +149,14 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
     bloqueado.current = true
     setDirecao(1)
     onResponder(valor)
+  }
+
+  // A escolha fica salva: quem liga a linguagem simples continua vendo-a nas próximas propostas.
+  const alternarSimples = () => {
+    setSimples((v) => {
+      salvarPreferenciaSimples(!v)
+      return !v
+    })
   }
 
   const voltar = () => {
@@ -124,22 +234,15 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
             animate="centro"
             exit="sair"
             transition={{ duration: 0.28, ease: 'easeOut' }}
-            className="glass-strong relative w-full overflow-hidden rounded-3xl p-6 sm:p-10"
+            className="glass-strong relative w-full rounded-3xl p-6 sm:p-10"
           >
-            <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-cyan-400/10 blur-3xl" />
-            <div className="flex items-center justify-between gap-2">
-              <CategoriaTag categoria={proposta.categoria} />
-              <span className="font-mono text-xs text-slate-500">#{String(atual + 1).padStart(2, '0')}</span>
-            </div>
-            <p className="mt-3 text-xs font-medium uppercase tracking-[0.18em] text-slate-500">Um candidato propõe:</p>
-            <h2 className="mt-3 min-h-[6.5rem] font-display text-xl font-semibold leading-snug text-white sm:min-h-[7.5rem] sm:text-3xl">
-              {proposta.texto}
-            </h2>
-            {respostaAtual !== undefined && (
-              <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-slate-400">
-                <Check className="h-3.5 w-3.5 text-cyan-300" /> Você já respondeu esta. Escolha de novo para alterar.
-              </p>
-            )}
+            <CartaoProposta
+              proposta={proposta}
+              numero={atual + 1}
+              respondida={respostaAtual !== undefined}
+              simples={simples}
+              onAlternarSimples={alternarSimples}
+            />
           </motion.article>
         </AnimatePresence>
       </div>
