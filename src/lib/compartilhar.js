@@ -18,15 +18,15 @@ export async function gerarImagemResultado(resultado, url) {
   const ctx = canvas.getContext('2d')
 
   const fundo = ctx.createLinearGradient(0, 0, LARGURA, ALTURA)
-  fundo.addColorStop(0, '#071022')
-  fundo.addColorStop(0.55, '#0b0820')
-  fundo.addColorStop(1, '#1a0b2e')
+  fundo.addColorStop(0, '#0d0e12')
+  fundo.addColorStop(0.55, '#121318')
+  fundo.addColorStop(1, '#1b1c22')
   ctx.fillStyle = fundo
   ctx.fillRect(0, 0, LARGURA, ALTURA)
 
   for (const [x, y, r, cor] of [
-    [120, 140, 420, 'rgba(34,211,238,0.22)'],
-    [980, 1180, 480, 'rgba(168,85,247,0.25)'],
+    [120, 140, 420, 'rgba(226,232,240,0.10)'],
+    [980, 1180, 480, 'rgba(148,163,184,0.14)'],
   ]) {
     const brilho = ctx.createRadialGradient(x, y, 0, x, y, r)
     brilho.addColorStop(0, cor)
@@ -36,14 +36,14 @@ export async function gerarImagemResultado(resultado, url) {
   }
 
   ctx.textAlign = 'center'
-  ctx.fillStyle = '#67e8f9'
+  ctx.fillStyle = '#cbd5e1'
   ctx.font = '600 30px Inter, sans-serif'
   ctx.fillText('ELEIÇÕES 2026 · TESTE CEGO', LARGURA / 2, 150)
 
   const titulo = ctx.createLinearGradient(240, 0, 840, 0)
-  titulo.addColorStop(0, '#a5f3fc')
-  titulo.addColorStop(0.5, '#c4b5fd')
-  titulo.addColorStop(1, '#f0abfc')
+  titulo.addColorStop(0, '#ffffff')
+  titulo.addColorStop(0.5, '#e2e8f0')
+  titulo.addColorStop(1, '#94a3b8')
   ctx.fillStyle = titulo
   ctx.font = '700 92px "Space Grotesk", Inter, sans-serif'
   ctx.fillText('Meu Match', LARGURA / 2, 260)
@@ -106,7 +106,7 @@ export async function gerarImagemResultado(resultado, url) {
   ctx.fillStyle = '#e2e8f0'
   ctx.font = '600 34px Inter, sans-serif'
   ctx.fillText('Faça o seu teste:', LARGURA / 2, ALTURA - 120)
-  ctx.fillStyle = '#67e8f9'
+  ctx.fillStyle = '#cbd5e1'
   ctx.font = '700 38px "Space Grotesk", Inter, sans-serif'
   ctx.fillText(url.replace(/^https?:\/\//, '').replace(/\/$/, ''), LARGURA / 2, ALTURA - 70)
 

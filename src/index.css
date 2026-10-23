@@ -13,7 +13,7 @@
     @apply min-h-dvh bg-[#05060f] font-sans text-slate-100 antialiased;
   }
   ::selection {
-    @apply bg-cyan-400/30;
+    @apply bg-slate-400/30;
   }
 }
 
@@ -22,7 +22,7 @@
     @apply border border-white/10 bg-white/[0.04] shadow-[0_8px_40px_-12px_rgba(0,0,0,0.6)] backdrop-blur-xl;
   }
   .glass-strong {
-    @apply border border-white/15 bg-white/[0.07] shadow-[0_20px_60px_-20px_rgba(34,211,238,0.25)] backdrop-blur-2xl;
+    @apply border border-white/15 bg-white/[0.07] shadow-[0_20px_60px_-20px_rgba(226,232,240,0.18)] backdrop-blur-2xl;
   }
   .grid-bg {
     background-image:
@@ -32,6 +32,64 @@
     mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
   }
   .text-gradient {
-    @apply bg-gradient-to-r from-cyan-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent;
+  }
+}
+
+/* Urna eletrônica: corpo cinza-claro, visor de cristal líquido e teclas com relevo. */
+@layer components {
+  .urna-corpo {
+    background: linear-gradient(160deg, #e9e8e3 0%, #d6d5cf 55%, #c8c7c0 100%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      inset 0 2px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.08),
+      0 30px 60px -25px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(0, 0, 0, 0.25);
+  }
+  .urna-visor {
+    background: linear-gradient(180deg, #f6f7f2 0%, #eceee6 100%);
+    border: 6px solid #3a3c3f;
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.18),
+      0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  .urna-teclado {
+    background: linear-gradient(180deg, #cfcec8 0%, #c2c1ba 100%);
+    box-shadow:
+      inset 0 2px 6px rgba(0, 0, 0, 0.15),
+      0 1px 0 rgba(255, 255, 255, 0.6);
+  }
+  .tecla {
+    @apply relative flex flex-col items-center justify-center rounded-lg font-display font-bold transition-[transform,box-shadow] duration-75 outline-none select-none;
+    box-shadow:
+      0 4px 0 rgba(0, 0, 0, 0.55),
+      0 6px 10px rgba(0, 0, 0, 0.25);
+  }
+  .tecla:active:not(:disabled),
+  .tecla[data-pressionada='true'] {
+    transform: translateY(3px);
+    box-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.55),
+      0 2px 4px rgba(0, 0, 0, 0.25);
+  }
+  .tecla:focus-visible {
+    @apply ring-2 ring-sky-500 ring-offset-2 ring-offset-[#cfcec8];
+  }
+  .tecla-numero {
+    background: linear-gradient(180deg, #34363a 0%, #1d1e21 100%);
+    @apply text-white;
+  }
+  .tecla-branco {
+    background: linear-gradient(180deg, #ffffff 0%, #e6e6e1 100%);
+    @apply text-slate-900;
+  }
+  .tecla-corrige {
+    background: linear-gradient(180deg, #f59a3c 0%, #e0761a 100%);
+    @apply text-slate-950;
+  }
+  .tecla-confirma {
+    background: linear-gradient(180deg, #3fb257 0%, #2a8a3f 100%);
+    @apply text-white;
   }
 }

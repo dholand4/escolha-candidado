@@ -11,8 +11,8 @@ const PASSOS = [
 ]
 
 const OPCOES_MODO = [
-  { ...MODOS.rapido, icone: Zap, descricao: '10 de cada candidato', tempo: '~3 min', destaque: 'from-cyan-400 to-sky-500' },
-  { ...MODOS.completo, icone: ListChecks, descricao: '25 de cada candidato', tempo: '~8 min', destaque: 'from-violet-400 to-fuchsia-500' },
+  { ...MODOS.rapido, icone: Zap, descricao: '10 de cada candidato', tempo: '~3 min', destaque: 'from-white to-slate-300' },
+  { ...MODOS.completo, icone: ListChecks, descricao: '25 de cada candidato', tempo: '~8 min', destaque: 'from-slate-300 to-slate-500' },
 ]
 
 const item = {
@@ -24,7 +24,7 @@ export default function Home({ onIniciar }) {
   return (
     <div className="flex flex-1 flex-col justify-center gap-8 py-4">
       <motion.div custom={0} variants={item} initial="hidden" animate="show" className="text-center">
-        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium tracking-wide text-cyan-200">
+        <span className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium tracking-wide text-slate-200">
           <Sparkles className="h-3.5 w-3.5" /> Eleições Presidenciais 2026 · 2º turno
         </span>
         <h1 className="mt-5 font-display text-4xl font-bold tracking-tight sm:text-6xl">
@@ -45,7 +45,7 @@ export default function Home({ onIniciar }) {
               onClick={() => onIniciar(id)}
               whileHover={{ y: -4 }}
               whileTap={{ scale: 0.98 }}
-              className="glass-strong group relative overflow-hidden rounded-3xl p-6 text-left outline-none transition-colors hover:border-white/30 focus-visible:ring-2 focus-visible:ring-cyan-300"
+              className="glass-strong group relative overflow-hidden rounded-3xl p-6 text-left outline-none transition-colors hover:border-white/30 focus-visible:ring-2 focus-visible:ring-slate-200"
             >
               <div className={`absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gradient-to-br ${destaque} opacity-20 blur-2xl transition-opacity group-hover:opacity-40`} />
               <div className={`inline-flex rounded-xl bg-gradient-to-br ${destaque} p-2.5 text-slate-950`}>
@@ -58,7 +58,7 @@ export default function Home({ onIniciar }) {
               <p className="mt-1 text-sm text-slate-400">
                 {descricao} · {tempo}
               </p>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-cyan-200">
+              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-slate-100">
                 Começar <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </span>
             </motion.button>
@@ -73,7 +73,7 @@ export default function Home({ onIniciar }) {
         <div className="grid gap-3 sm:grid-cols-2">
           {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
             <motion.div key={titulo} custom={i + 3} variants={item} initial="hidden" animate="show" className="glass rounded-2xl p-4">
-              <Icone className="h-5 w-5 text-cyan-300" />
+              <Icone className="h-5 w-5 text-slate-300" />
               <h3 className="mt-3 font-display text-sm font-semibold text-white">{titulo}</h3>
               <p className="mt-1 text-sm leading-relaxed text-slate-400">{texto}</p>
             </motion.div>

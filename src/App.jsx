@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Analytics } from '@vercel/analytics/react'
 import { track } from '@vercel/analytics'
 import Background from './components/Background.jsx'
+import FimUrna from './components/FimUrna.jsx'
 import Home from './components/Home.jsx'
 import Quiz from './components/Quiz.jsx'
 import Result from './components/Result.jsx'
@@ -35,20 +36,36 @@ export default function App() {
 
   const revisar = useCallback(() => setEstado((e) => ({ ...e, concluido: false })), [])
 
-  const tela = !estado ? 'home' : estado.concluido ? 'resultado' : 'quiz'
+  const etapa = !estado ? 'home' : estado.concluido ? 'resultado' : 'quiz'
+  const [mostrandoFim, setMostrandoFim] = useState(false)
+  const tela = mostrandoFim ? 'fim' : etapa
 
-  // Conta, de forma anônima, quantos testes foram concluídos. Só o modo é enviado, nunca as respostas.
-  // Dispara apenas na passagem do quiz para o resultado, não ao recarregar a tela de resultado.
-  const telaAnterior = useRef(tela)
+  // Ao terminar a última pergunta, o visor da urna mostra "FIM" por um instante antes do resultado.
+  // Também conta, de forma anônima, quantos testes foram concluídos (só o modo é enviado, nunca as respostas).
+  // Nada disso acontece ao recarregar a página já na tela de resultado.
+  const etapaAnterior = useRef(etapa)
   useEffect(() => {
-    if (telaAnterior.current === 'quiz' && tela === 'resultado') track('teste_concluido', { modo: estado.modo })
-    telaAnterior.current = tela
-  }, [tela, estado])
+    if (etapaAnterior.current === 'quiz' && etapa === 'resultado') {
+      setMostrandoFim(true)
+      track('teste_concluido', { modo: estado.modo })
+    }
+    etapaAnterior.current = etapa
+  }, [etapa, estado])
+
+  useEffect(() => {
+    if (!mostrandoFim) return
+    const t = setTimeout(() => setMostrandoFim(false), 2200)
+    return () => clearTimeout(t)
+  }, [mostrandoFim])
 
   return (
     <div className="relative min-h-dvh overflow-x-hidden">
       <Background />
-      <main className="relative z-10 mx-auto flex min-h-dvh w-full max-w-3xl flex-col px-4 py-6 sm:px-6 sm:py-10">
+      <main
+        className={`relative z-10 mx-auto flex min-h-dvh w-full flex-col px-4 py-6 sm:px-6 sm:py-10 ${
+          tela === 'quiz' ? 'max-w-4xl' : 'max-w-3xl'
+        }`}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={tela}
@@ -68,6 +85,7 @@ export default function App() {
                 onRecomecar={recomecar}
               />
             )}
+            {tela === 'fim' && <FimUrna />}
             {tela === 'resultado' && <Result estado={estado} onRevisar={revisar} onRecomecar={recomecar} />}
           </motion.div>
         </AnimatePresence>

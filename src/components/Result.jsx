@@ -88,7 +88,7 @@ function Compartilhar({ resultado }) {
           type="button"
           onClick={compartilhar}
           disabled={estado === 'gerando'}
-          className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-4 py-3 text-sm font-semibold text-slate-950 transition-opacity hover:opacity-90 disabled:opacity-60"
+          className="inline-flex flex-1 items-center justify-center gap-2 rounded-2xl bg-gradient-to-b from-[#f1f0eb] to-[#c9c8c1] px-4 py-3 text-sm font-semibold text-slate-900 shadow-[0_3px_0_rgba(0,0,0,0.5)] transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {estado === 'gerando' ? <Loader2 className="h-4 w-4 animate-spin" /> : navigator.canShare ? <Share2 className="h-4 w-4" /> : <Download className="h-4 w-4" />}
           {navigator.canShare ? 'Compartilhar imagem' : 'Baixar imagem'}
@@ -164,7 +164,7 @@ function ItemGabarito({ proposta, numero, voto }) {
         aria-expanded={aberto}
         className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-white/10"
       >
-        <FileText className="h-3.5 w-3.5 text-cyan-300" />
+        <FileText className="h-3.5 w-3.5 text-slate-300" />
         {aberto ? 'Esconder trecho' : 'Ver trecho no plano'}
         <ChevronDown className={`h-3.5 w-3.5 transition-transform ${aberto ? 'rotate-180' : ''}`} />
       </button>
@@ -193,7 +193,7 @@ function ItemGabarito({ proposta, numero, voto }) {
                   href={linkPagina(proposta)}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-1 font-medium text-cyan-300 hover:text-cyan-200"
+                  className="inline-flex items-center gap-1 font-medium text-slate-100 underline decoration-slate-500 underline-offset-2 hover:text-white"
                 >
                   Abrir o PDF na pág. {proposta.pagina} <ExternalLink className="h-3 w-3" />
                 </a>
@@ -240,7 +240,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.1 }}
-            className="mx-auto inline-flex rounded-2xl bg-gradient-to-br from-cyan-400 to-violet-500 p-3 text-slate-950"
+            className="mx-auto inline-flex rounded-2xl bg-gradient-to-b from-[#f1f0eb] to-[#c9c8c1] p-3 text-slate-900 shadow-[0_3px_0_rgba(0,0,0,0.5)]"
           >
             {vencedor ? <Trophy className="h-6 w-6" /> : <Scale className="h-6 w-6" />}
           </motion.div>
@@ -363,7 +363,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
           className="flex w-full items-center justify-between gap-3 p-5 text-left transition-colors hover:bg-white/[0.03] sm:p-7"
         >
           <span className="flex items-center gap-3">
-            <BookOpen className="h-5 w-5 text-cyan-300" />
+            <BookOpen className="h-5 w-5 text-slate-300" />
             <span>
               <span className="block font-display text-lg font-semibold text-white">Gabarito</span>
               <span className="block text-sm text-slate-400">De quem era cada proposta, como você votou e o trecho do plano</span>
@@ -418,13 +418,13 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
         <ul className="mt-2 space-y-1">
           {ranking.map((id) => (
             <li key={id}>
-              <a href={CANDIDATOS[id].pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
+              <a href={CANDIDATOS[id].pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white">
                 {CANDIDATOS[id].nome}: {CANDIDATOS[id].plano} (PDF) <ExternalLink className="h-3 w-3" />
               </a>
             </li>
           ))}
           <li>
-            <a href={TSE_PLANOS} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
+            <a href={TSE_PLANOS} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-white">
               Página oficial dos planos no TSE <ExternalLink className="h-3 w-3" />
             </a>
           </li>
