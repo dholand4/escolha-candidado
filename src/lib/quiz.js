@@ -39,7 +39,7 @@ export function sortearOrdem(modo) {
 }
 
 export function novoEstado(modo) {
-  return { modo, ordem: sortearOrdem(modo), atual: 0, respostas: {}, concluido: false }
+  return { modo, ordem: sortearOrdem(modo), atual: 0, respostas: {}, importantes: {}, concluido: false }
 }
 
 export function carregarEstado() {
@@ -89,44 +89,74 @@ export function salvarPreferenciaSimples(ativo) {
   }
 }
 
+// Propostas marcadas como "importante para mim" valem o dobro no cálculo.
+export const PESO_IMPORTANTE = 2
+
 // Converte a soma de pontos em afinidade de 0 a 100%: -2 em tudo = 0%, neutro em tudo = 50%, +2 em tudo = 100%.
-function percentual(soma, quantidade) {
-  if (quantidade === 0) return null
-  return Math.round(((soma + 2 * quantidade) / (4 * quantidade)) * 100)
+// `peso` é a quantidade de respostas já multiplicada pelos pesos.
+function percentual(soma, peso) {
+  if (peso === 0) return null
+  return Math.round(((soma + 2 * peso) / (4 * peso)) * 100)
 }
 
 export function calcularResultado(estado) {
-  const ids = Object.keys(CANDIDATOS)
-  const vazio = () => Object.fromEntries(ids.map((c) => [c, { soma: 0, quantidade: 0 }]))
+  const importantes = estado.importantes ?? {}
+  const vazio = () => Object.fromEntries(Object.keys(CANDIDATOS).map((c) => [c, { soma: 0, peso: 0, quantidade: 0 }]))
   const geral = vazio()
   const porCategoria = Object.fromEntries(CATEGORIAS.map((cat) => [cat, vazio()]))
+  const respondidas = []
 
   for (const id of estado.ordem) {
     const voto = estado.respostas[id]
     if (voto === undefined) continue
     const proposta = PROPOSTAS_POR_ID[id]
+    const peso = importantes[id] ? PESO_IMPORTANTE : 1
+    respondidas.push({ proposta, voto, importante: Boolean(importantes[id]) })
     for (const alvo of [geral[proposta.candidato], porCategoria[proposta.categoria][proposta.candidato]]) {
-      alvo.soma += voto
+      alvo.soma += voto * peso
+      alvo.peso += peso
       alvo.quantidade += 1
     }
   }
 
   const afinidade = Object.fromEntries(
-    ids.map((c) => [c, { ...geral[c], pct: percentual(geral[c].soma, geral[c].quantidade) ?? 50 }]),
+    Object.keys(CANDIDATOS).map((c) => [c, { ...geral[c], pct: percentual(geral[c].soma, geral[c].peso) ?? 50 }]),
   )
-  const temas = CATEGORIAS.map((categoria) => ({
-    categoria,
-    candidatos: Object.fromEntries(
-      ids.map((c) => {
-        const { soma, quantidade } = porCategoria[categoria][c]
-        return [c, { soma, quantidade, pct: percentual(soma, quantidade) }]
+
+  // Ordem de exibição: maior afinidade primeiro; em empate, ordem alfabética, para nenhum candidato
+  // aparecer sempre em primeiro por padrão.
+  const ranking = Object.keys(CANDIDATOS).sort(
+    (a, b) => afinidade[b].pct - afinidade[a].pct || CANDIDATOS[a].nome.localeCompare(CANDIDATOS[b].nome, 'pt-BR'),
+  )
+
+  // `lider` só é definido quando os dois candidatos têm propostas respondidas no tema e não há empate;
+  // com propostas de um só candidato, não dá para dizer de quem a pessoa está mais perto.
+  const temas = CATEGORIAS.map((categoria) => {
+    const candidatos = Object.fromEntries(
+      ranking.map((c) => {
+        const { soma, peso, quantidade } = porCategoria[categoria][c]
+        return [c, { soma, quantidade, pct: percentual(soma, peso) }]
       }),
-    ),
-  })).filter((t) => ids.some((c) => t.candidatos[c].quantidade > 0))
+    )
+    const [a, b] = ranking.map((c) => candidatos[c].pct)
+    const comparavel = a !== null && b !== null && a !== b
+    return { categoria, candidatos, lider: comparavel ? ranking[a > b ? 0 : 1] : null }
+  }).filter((t) => ranking.some((c) => t.candidatos[c].quantidade > 0))
 
-  const [a, b] = ids
-  const diferenca = afinidade[a].pct - afinidade[b].pct
-  const vencedor = diferenca === 0 ? null : diferenca > 0 ? a : b
+  // Até 3 propostas de cada candidato com que a pessoa mais concordou e que mais rejeitou;
+  // as marcadas como importantes desempatam.
+  const intensidade = (r) => Math.abs(r.voto) * 10 + (r.importante ? 1 : 0)
+  const destaques = Object.fromEntries(
+    ranking.map((c) => {
+      const doCandidato = respondidas.filter((r) => r.proposta.candidato === c)
+      const ordenar = (lista) => lista.sort((a, b) => intensidade(b) - intensidade(a)).slice(0, 3)
+      return [c, { concorda: ordenar(doCandidato.filter((r) => r.voto > 0)), discorda: ordenar(doCandidato.filter((r) => r.voto < 0)) }]
+    }),
+  )
 
-  return { afinidade, temas, vencedor, diferenca: Math.abs(diferenca) }
+  const [primeiro, segundo] = ranking
+  const diferenca = afinidade[primeiro].pct - afinidade[segundo].pct
+  const vencedor = diferenca === 0 ? null : primeiro
+
+  return { afinidade, ranking, temas, destaques, vencedor, diferenca }
 }

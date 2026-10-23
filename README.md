@@ -10,6 +10,7 @@ Aplicação 100% front-end (React + Tailwind CSS + Lucide Icons + Framer Motion)
 npm install
 npm run dev      # ambiente de desenvolvimento
 npm run build    # gera a versão estática em dist/
+npm test         # testes do cálculo, do sorteio e dos dados
 ```
 
 A pasta `dist/` pode ser publicada em qualquer hospedagem estática (GitHub Pages, Netlify, Vercel…).
@@ -19,10 +20,17 @@ A pasta `dist/` pode ser publicada em qualquer hospedagem estática (GitHub Page
 - **Banco fixo de 100 propostas** em `src/data/propostas.js` (50 de cada candidato), escritas de forma neutra, com categoria, autor e uma versão em linguagem simples. Só entram propostas exclusivas de um candidato: ideias que aparecem nos dois planos ficaram de fora.
 - **Teste Rápido (20)** sorteia 10 propostas de cada candidato; **Teste Completo (50)** sorteia 25 de cada. Cada teste traz propostas e ordem diferentes.
 - **Fácil de entender:** termos técnicos vêm sublinhados (glossário em `src/data/glossario.js`) e mostram a explicação ao passar o mouse ou tocar; o botão "Explicar em linguagem simples" mostra a proposta reescrita de forma leiga.
+- **Ouvir:** o botão "Ouvir" lê a proposta em voz alta com a voz em português do próprio navegador.
+- **Importante para mim:** cada proposta pode ser marcada (botão ou tecla I) e passa a valer o dobro no cálculo.
 - **Escala:** Concordo totalmente +2 · Concordo +1 · Neutro 0 · Discordo −1 · Discordo totalmente −2. Os pontos vão para o autor da proposta.
 - **Afinidade (%)** = `(soma + 2·n) / (4·n)`, onde `n` é o número de propostas do candidato respondidas: 0% = discordou totalmente de tudo, 50% = neutro, 100% = concordou totalmente com tudo. O mesmo cálculo é feito por tema.
 - **Salvamento automático** no `localStorage` (ordem sorteada, pergunta atual e respostas). Um F5 ou fechar a aba não perde o progresso; o botão "Recomeçar do zero" limpa tudo.
-- **Atalhos:** teclas 1–5 respondem; ← ou Backspace voltam.
+- **Resultado:** candidatos ordenados por afinidade, afinidade por tema, as propostas de cada um que a pessoa mais apoiou e mais rejeitou, e gabarito com a fonte de cada proposta e o link do plano completo.
+- **Compartilhar:** gera no navegador uma imagem com as porcentagens (nunca as respostas) e abre o compartilhar do celular; também há envio pelo WhatsApp e cópia do texto.
+- **Prévia do link:** metatags Open Graph com `public/og.png`, apontando para `https://escolha-candidado.vercel.app`. Se o domínio mudar, atualize as URLs em `index.html`.
+- **Offline:** `public/sw.js` guarda o app depois da primeira visita, e ele pode ser instalado na tela inicial do celular.
+- **Visitas:** Vercel Web Analytics, sem cookies, conta visitas e o evento `teste_concluido` (só o modo do teste). Precisa ser ativado no painel da Vercel em *Analytics*; eventos personalizados exigem plano pago.
+- **Atalhos:** teclas 1–5 respondem; I marca como importante; ← ou Backspace voltam.
 
 ## Fontes
 

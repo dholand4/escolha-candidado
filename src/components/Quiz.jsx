@@ -8,7 +8,10 @@ import {
   History,
   Lightbulb,
   Minus,
+  Volume2,
   RotateCcw,
+  Square,
+  Star,
   ThumbsDown,
   ThumbsUp,
   X,
@@ -32,8 +35,40 @@ const variantesCard = {
   sair: (direcao) => ({ opacity: 0, x: direcao * -60, rotate: direcao * -2, scale: 0.97 }),
 }
 
-function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimples }) {
+const VOZ_DISPONIVEL = typeof window !== 'undefined' && 'speechSynthesis' in window
+
+// Lê o texto em voz alta com a voz em português do próprio navegador (nada é enviado a servidores).
+function useLeitura() {
+  const [falando, setFalando] = useState(false)
+  useEffect(() => () => VOZ_DISPONIVEL && window.speechSynthesis.cancel(), [])
+  const alternar = (texto) => {
+    const sintese = window.speechSynthesis
+    if (falando) {
+      sintese.cancel()
+      setFalando(false)
+      return
+    }
+    sintese.cancel()
+    const fala = new SpeechSynthesisUtterance(texto)
+    fala.lang = 'pt-BR'
+    fala.rate = 0.95
+    const voz = sintese.getVoices().find((v) => v.lang?.toLowerCase().startsWith('pt'))
+    if (voz) fala.voice = voz
+    fala.onend = fala.onerror = () => setFalando(false)
+    setFalando(true)
+    sintese.speak(fala)
+  }
+  return { falando, alternar }
+}
+
+const estiloAcao = (ativo, cor) =>
+  `inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+    ativo ? cor : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
+  }`
+
+function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimples, importante, onAlternarImportante }) {
   const [termo, setTermo] = useState(null)
+  const { falando, alternar: alternarLeitura } = useLeitura()
   return (
     <>
       <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
@@ -94,22 +129,41 @@ function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimpl
         )}
       </AnimatePresence>
 
-      <div className="relative mt-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <div className="relative mt-5 flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={onAlternarSimples}
           aria-pressed={simples}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-            simples
-              ? 'border-amber-300/40 bg-amber-400/15 text-amber-100'
-              : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
-          }`}
+          className={estiloAcao(simples, 'border-amber-300/40 bg-amber-400/15 text-amber-100')}
         >
           <Lightbulb className="h-3.5 w-3.5" />
           {simples ? 'Linguagem simples: ligada' : 'Explicar em linguagem simples'}
         </button>
-        <span className="text-[11px] text-slate-500">Palavras sublinhadas têm explicação: toque nelas</span>
+        {VOZ_DISPONIVEL && (
+          <button
+            type="button"
+            onClick={() => alternarLeitura(`Um candidato propõe: ${simples ? proposta.simples : proposta.texto}`)}
+            aria-pressed={falando}
+            className={estiloAcao(falando, 'border-violet-300/40 bg-violet-400/15 text-violet-100')}
+          >
+            {falando ? <Square className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+            {falando ? 'Parar' : 'Ouvir'}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onAlternarImportante}
+          aria-pressed={importante}
+          title="Propostas importantes valem o dobro no resultado"
+          className={estiloAcao(importante, 'border-yellow-300/40 bg-yellow-400/15 text-yellow-100')}
+        >
+          <Star className={`h-3.5 w-3.5 ${importante ? 'fill-yellow-300 text-yellow-300' : ''}`} />
+          {importante ? 'Importante (vale o dobro)' : 'Importante para mim'}
+        </button>
       </div>
+      <p className="relative mt-3 text-[11px] text-slate-500">
+        Palavras sublinhadas têm explicação: toque nelas. Marque como importante os temas que mais pesam no seu voto.
+      </p>
 
       {respondida && (
         <p className="relative mt-3 inline-flex items-center gap-1.5 text-xs text-slate-400">
@@ -120,7 +174,7 @@ function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimpl
   )
 }
 
-export default function Quiz({ estado, restaurado, onResponder, onVoltar, onRecomecar }) {
+export default function Quiz({ estado, restaurado, onResponder, onAlternarImportante, onVoltar, onRecomecar }) {
   const { ordem, atual, respostas, modo } = estado
   const proposta = PROPOSTAS_POR_ID[ordem[atual]]
   const respostaAtual = respostas[proposta.id]
@@ -165,12 +219,13 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
     onVoltar()
   }
 
-  // Atalhos: teclas 1–5 respondem; seta para a esquerda ou Backspace voltam.
+  // Atalhos: teclas 1–5 respondem; I marca como importante; seta para a esquerda ou Backspace voltam.
   useEffect(() => {
     const aoTeclar = (ev) => {
       if (ev.metaKey || ev.ctrlKey || ev.altKey) return
       const indice = ['1', '2', '3', '4', '5'].indexOf(ev.key)
       if (indice >= 0) responder(OPCOES[indice].valor)
+      else if (ev.key === 'i' || ev.key === 'I') onAlternarImportante()
       else if (ev.key === 'ArrowLeft' || ev.key === 'Backspace') voltar()
     }
     window.addEventListener('keydown', aoTeclar)
@@ -242,6 +297,8 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
               respondida={respostaAtual !== undefined}
               simples={simples}
               onAlternarSimples={alternarSimples}
+              importante={Boolean(estado.importantes?.[proposta.id])}
+              onAlternarImportante={onAlternarImportante}
             />
           </motion.article>
         </AnimatePresence>
@@ -284,7 +341,7 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
         >
           <ArrowLeft className="h-4 w-4" /> Pergunta anterior
         </button>
-        <span className="hidden text-xs text-slate-500 sm:inline">Atalhos: teclas 1–5 · ← volta</span>
+        <span className="hidden text-xs text-slate-500 sm:inline">Atalhos: 1–5 respondem · I importante · ← volta</span>
       </div>
     </div>
   )
