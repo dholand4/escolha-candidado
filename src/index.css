@@ -36,7 +36,7 @@
   }
 }
 
-/* Teclas inspiradas na urna eletrônica: relevo, número grande e as cores de BRANCO, CORRIGE e CONFIRMA. */
+/* Teclas inspiradas na urna eletrônica: relevo e número grande. */
 @layer components {
   .tecla {
     @apply relative flex items-center rounded-xl border font-display font-bold transition-[transform,box-shadow,background-color] duration-75 outline-none select-none;
@@ -57,17 +57,5 @@
   .tecla-numero {
     background: linear-gradient(180deg, #ffffff 0%, #ededea 100%);
     @apply border-slate-300 text-slate-900 hover:border-slate-400;
-  }
-  .tecla-branco {
-    background: linear-gradient(180deg, #ffffff 0%, #f6f6f3 100%);
-    @apply border-slate-300 text-slate-900;
-  }
-  .tecla-corrige {
-    background: linear-gradient(180deg, #f8a54d 0%, #ea8124 100%);
-    @apply border-orange-500 text-slate-950;
-  }
-  .tecla-confirma {
-    background: linear-gradient(180deg, #45b85c 0%, #2f9246 100%);
-    @apply border-green-700 text-white;
   }
 }

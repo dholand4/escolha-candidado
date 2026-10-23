@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BookOpenText, Check, History, Lightbulb, RotateCcw, Square, Volume2, VolumeX, X } from 'lucide-react'
+import { ArrowLeft, BookOpenText, Check, History, Lightbulb, RotateCcw, Square, Volume2, VolumeX, X } from 'lucide-react'
 import { PROPOSTAS_POR_ID } from '../data/propostas.js'
 import { MODOS, OPCOES, ROTULO_VOTO, carregarPreferenciaSimples, salvarPreferenciaSimples } from '../lib/quiz.js'
 import { carregarPreferenciaSom, salvarPreferenciaSom, tocarFim, tocarTecla } from '../lib/som.js'
@@ -140,12 +140,13 @@ function Visor({ proposta, numero, total, voto, simples, onAlternarSimples }) {
         {voto !== undefined && (
           <p className="mb-2 inline-flex items-center gap-1.5 text-xs text-slate-700">
             <Check className="h-3.5 w-3.5 text-green-700" />
-            Seu voto: <strong>{ROTULO_VOTO[voto]}</strong>. Aperte CONFIRMA para manter ou outra tecla para mudar.
+            <span>
+              Seu voto: <strong>{ROTULO_VOTO[voto]}</strong>. Aperte outra tecla para mudar.
+            </span>
           </p>
         )}
         <p className="border-t border-slate-400/60 pt-2 text-[11px] leading-relaxed text-slate-600">
-          Aperte uma tecla de <strong>1 a 5</strong> para votar · <strong>BRANCO</strong> é neutro ·{' '}
-          <strong>CORRIGE</strong> volta à anterior · palavras sublinhadas têm explicação.
+          Aperte uma tecla de <strong>1 a 5</strong> para votar · palavras sublinhadas têm explicação.
         </p>
       </div>
     </div>
@@ -194,17 +195,11 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
     onResponder(valor)
   }
 
-  const corrigir = () => {
+  const voltar = () => {
     if (atual === 0) return
-    afundar('corrige')
     if (som) tocarTecla()
     setDirecao(-1)
     onVoltar()
-  }
-
-  const confirmar = () => {
-    if (respostaAtual === undefined) return
-    votar(respostaAtual, 'confirma')
   }
 
   const alternarSimples = () => {
@@ -222,14 +217,12 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
     })
   }
 
-  // Atalhos: 1–5 votam; B é branco (neutro); Enter confirma; seta para a esquerda ou Backspace corrigem.
+  // Atalhos: 1–5 votam; seta para a esquerda ou Backspace voltam.
   useEffect(() => {
     const aoTeclar = (ev) => {
       if (ev.metaKey || ev.ctrlKey || ev.altKey) return
       if (VALOR_DA_TECLA[ev.key] !== undefined) votar(VALOR_DA_TECLA[ev.key], ev.key)
-      else if (ev.key === 'b' || ev.key === 'B') votar(0, 'branco')
-      else if (ev.key === 'Enter' && ev.target === document.body) confirmar()
-      else if (ev.key === 'ArrowLeft' || ev.key === 'Backspace') corrigir()
+      else if (ev.key === 'ArrowLeft' || ev.key === 'Backspace') voltar()
     }
     window.addEventListener('keydown', aoTeclar)
     return () => window.removeEventListener('keydown', aoTeclar)
@@ -342,44 +335,17 @@ export default function Quiz({ estado, restaurado, onResponder, onVoltar, onReco
         })}
       </div>
 
-      <div className="grid grid-cols-3 gap-2.5">
+      <div className="flex items-center justify-between gap-3">
         <button
           type="button"
-          onClick={() => votar(0, 'branco')}
-          aria-label="Branco: Neutro"
-          data-pressionada={pressionada === 'branco'}
-          className="tecla tecla-branco cursor-pointer flex-col justify-center py-3"
-        >
-          <span className="text-sm tracking-wider">BRANCO</span>
-          <span className="font-sans text-[11px] font-medium text-slate-500">neutro</span>
-        </button>
-        <button
-          type="button"
-          onClick={corrigir}
+          onClick={voltar}
           disabled={atual === 0}
-          aria-label="Corrige: voltar à pergunta anterior"
-          data-pressionada={pressionada === 'corrige'}
-          className="tecla tecla-corrige cursor-pointer flex-col justify-center py-3 disabled:cursor-not-allowed disabled:opacity-40"
+          className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          <span className="text-sm tracking-wider">CORRIGE</span>
-          <span className="font-sans text-[11px] font-medium text-slate-900/70">voltar</span>
+          <ArrowLeft className="h-4 w-4" /> Voltar
         </button>
-        <button
-          type="button"
-          onClick={confirmar}
-          disabled={respostaAtual === undefined}
-          aria-label="Confirma: manter o voto e seguir"
-          data-pressionada={pressionada === 'confirma'}
-          className="tecla tecla-confirma cursor-pointer flex-col justify-center py-3 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          <span className="text-sm tracking-wider">CONFIRMA</span>
-          <span className="font-sans text-[11px] font-medium text-white/85">manter</span>
-        </button>
+        <span className="hidden text-xs text-slate-400 sm:inline">No computador: teclas 1–5 votam · ← volta</span>
       </div>
-
-      <p className="hidden text-center text-xs text-slate-400 sm:block">
-        No computador: teclas 1–5 votam · B branco · Enter confirma · ← corrige
-      </p>
     </div>
   )
 }
