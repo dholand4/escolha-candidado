@@ -6,18 +6,18 @@ import {
   ChevronDown,
   Download,
   ExternalLink,
+  FileText,
   Link2,
   Loader2,
   PencilLine,
   RotateCcw,
   Scale,
   Share2,
-  Star,
   ThumbsDown,
   ThumbsUp,
   Trophy,
 } from 'lucide-react'
-import { CANDIDATOS, FONTES, PLANO_COMPLETO, PROPOSTAS_POR_ID, TSE_PLANOS } from '../data/propostas.js'
+import { CANDIDATOS, PROPOSTAS_POR_ID, TSE_PLANOS, linkPagina } from '../data/propostas.js'
 import { ROTULO_VOTO, calcularResultado } from '../lib/quiz.js'
 import { compartilharResultado, textoCompartilhamento } from '../lib/compartilhar.js'
 import CategoriaTag from './CategoriaTag.jsx'
@@ -126,12 +126,11 @@ function ListaDestaques({ titulo, icone: Icone, classe, itens }) {
       </p>
       {itens.length ? (
         <ul className="mt-2 space-y-2">
-          {itens.map(({ proposta, voto, importante }) => (
+          {itens.map(({ proposta, voto }) => (
             <li key={proposta.id} className="rounded-xl border border-white/5 bg-white/[0.03] px-3 py-2 text-sm leading-snug text-slate-200">
               {proposta.texto}
               <span className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
                 <CorVoto voto={voto} />
-                {importante && <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" aria-label="Marcada como importante" />}
               </span>
             </li>
           ))}
@@ -143,12 +142,74 @@ function ListaDestaques({ titulo, icone: Icone, classe, itens }) {
   )
 }
 
+// Uma linha do gabarito: autor, voto e, ao tocar, o trecho literal do plano com link para a página do PDF.
+function ItemGabarito({ proposta, numero, voto }) {
+  const [aberto, setAberto] = useState(false)
+  const c = CANDIDATOS[proposta.candidato]
+  const trechos = [proposta.trecho].flat()
+  return (
+    <li className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-mono text-xs text-slate-500">#{String(numero).padStart(2, '0')}</span>
+        <CategoriaTag categoria={proposta.categoria} pequena />
+        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${c.borda} ${c.fundo} ${c.texto}`}>{c.nome}</span>
+      </div>
+      <p className="mt-2 text-sm leading-relaxed text-slate-200">{proposta.texto}</p>
+      <p className="mt-1.5 text-xs text-slate-400">
+        Seu voto: <CorVoto voto={voto} />
+      </p>
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        aria-expanded={aberto}
+        className="mt-2.5 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-200 transition-colors hover:bg-white/10"
+      >
+        <FileText className="h-3.5 w-3.5 text-cyan-300" />
+        {aberto ? 'Esconder trecho' : 'Ver trecho no plano'}
+        <ChevronDown className={`h-3.5 w-3.5 transition-transform ${aberto ? 'rotate-180' : ''}`} />
+      </button>
+      <AnimatePresence initial={false}>
+        {aberto && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <figure className={`mt-3 rounded-xl border-l-2 ${c.borda} bg-white/[0.03] px-4 py-3`}>
+              <blockquote className="space-y-1 font-serif text-sm italic leading-relaxed text-slate-200">
+                {trechos.map((t, i) => (
+                  <p key={i}>
+                    “{t}”{i < trechos.length - 1 && <span className="not-italic text-slate-500"> […]</span>}
+                  </p>
+                ))}
+              </blockquote>
+              <figcaption className="mt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-400">
+                <span>
+                  {c.plano} · {c.nome} · pág. {proposta.pagina}
+                </span>
+                <a
+                  href={linkPagina(proposta)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1 font-medium text-cyan-300 hover:text-cyan-200"
+                >
+                  Abrir o PDF na pág. {proposta.pagina} <ExternalLink className="h-3 w-3" />
+                </a>
+              </figcaption>
+            </figure>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </li>
+  )
+}
+
 export default function Result({ estado, onRevisar, onRecomecar }) {
   const resultado = useMemo(() => calcularResultado(estado), [estado])
   const [gabaritoAberto, setGabaritoAberto] = useState(false)
   const { afinidade, ranking, temas, destaques, vencedor, diferenca } = resultado
-  const importantes = estado.importantes ?? {}
-  const totalImportantes = Object.keys(importantes).length
 
   const manchete = vencedor
     ? diferenca <= 5
@@ -187,8 +248,6 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
           <h1 className="mt-2 font-display text-2xl font-bold leading-tight text-white sm:text-4xl">{manchete}</h1>
           <p className="mx-auto mt-2 max-w-md text-sm text-slate-400">
             Afinidade de 0% (discordou totalmente de tudo) a 100% (concordou totalmente com tudo). 50% equivale a neutro.
-            {totalImportantes === 1 && ' A proposta que você marcou como importante valeu o dobro.'}
-            {totalImportantes > 1 && ` As ${totalImportantes} propostas que você marcou como importantes valeram o dobro.`}
           </p>
         </div>
 
@@ -307,7 +366,7 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
             <BookOpen className="h-5 w-5 text-cyan-300" />
             <span>
               <span className="block font-display text-lg font-semibold text-white">Gabarito</span>
-              <span className="block text-sm text-slate-400">De quem era cada proposta, como você votou e a fonte</span>
+              <span className="block text-sm text-slate-400">De quem era cada proposta, como você votou e o trecho do plano</span>
             </span>
           </span>
           <motion.span animate={{ rotate: gabaritoAberto ? 180 : 0 }}>
@@ -323,42 +382,9 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
               transition={{ duration: 0.35, ease: 'easeInOut' }}
             >
               <ol className="space-y-2 border-t border-white/5 p-3 sm:p-5">
-                {estado.ordem.map((id, i) => {
-                  const p = PROPOSTAS_POR_ID[id]
-                  const c = CANDIDATOS[p.candidato]
-                  const fonte = p.fonte && FONTES[p.fonte]
-                  const plano = PLANO_COMPLETO[p.candidato]
-                  return (
-                    <li key={id} className="rounded-2xl border border-white/5 bg-white/[0.02] p-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-xs text-slate-500">#{String(i + 1).padStart(2, '0')}</span>
-                        <CategoriaTag categoria={p.categoria} pequena />
-                        <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${c.borda} ${c.fundo} ${c.texto}`}>
-                          {c.nome}
-                        </span>
-                        {importantes[id] && (
-                          <span className="inline-flex items-center gap-1 text-[11px] text-yellow-200">
-                            <Star className="h-3 w-3 fill-yellow-300 text-yellow-300" /> Importante
-                          </span>
-                        )}
-                      </div>
-                      <p className="mt-2 text-sm leading-relaxed text-slate-200">{p.texto}</p>
-                      <p className="mt-1.5 text-xs text-slate-400">
-                        Seu voto: <CorVoto voto={estado.respostas[id]} />
-                      </p>
-                      <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-500">
-                        {fonte && (
-                          <a href={fonte.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
-                            Fonte: {fonte.nome} <ExternalLink className="h-3 w-3" />
-                          </a>
-                        )}
-                        <a href={plano.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
-                          Plano completo <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </p>
-                    </li>
-                  )
-                })}
+                {estado.ordem.map((id, i) => (
+                  <ItemGabarito key={id} proposta={PROPOSTAS_POR_ID[id]} numero={i + 1} voto={estado.respostas[id]} />
+                ))}
               </ol>
             </motion.div>
           )}
@@ -385,15 +411,15 @@ export default function Result({ estado, onRevisar, onRecomecar }) {
       <section className="text-xs leading-relaxed text-slate-500">
         <p className="font-medium text-slate-400">Sobre as propostas</p>
         <p className="mt-1">
-          Os textos resumem, de forma neutra, propostas exclusivas de cada plano de governo registrado no TSE. Ideias que
-          aparecem nos dois planos ficaram de fora. O teste é um exercício de reflexão, não é pesquisa eleitoral e não
-          substitui a leitura dos planos completos:
+          Cada proposta foi tirada dos planos de governo registrados no TSE e reescrita de forma neutra; no gabarito
+          você vê o trecho original e a página. Ideias que aparecem nos dois planos ficaram de fora. O teste é um
+          exercício de reflexão, não é pesquisa eleitoral e não substitui a leitura dos planos completos:
         </p>
         <ul className="mt-2 space-y-1">
           {ranking.map((id) => (
             <li key={id}>
-              <a href={PLANO_COMPLETO[id].url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
-                {CANDIDATOS[id].nome}: {CANDIDATOS[id].plano} <ExternalLink className="h-3 w-3" />
+              <a href={CANDIDATOS[id].pdf} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-cyan-300">
+                {CANDIDATOS[id].nome}: {CANDIDATOS[id].plano} (PDF) <ExternalLink className="h-3 w-3" />
               </a>
             </li>
           ))}

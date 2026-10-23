@@ -1,15 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { PROPOSTAS_POR_ID } from '../data/propostas.js'
-import { MODOS, PESO_IMPORTANTE, calcularResultado, novoEstado, sortearOrdem } from './quiz.js'
+import { MODOS, calcularResultado, novoEstado, sortearOrdem } from './quiz.js'
 
 // Monta um estado já respondido a partir de pares [id, voto].
-function estadoCom(votos, importantes = {}) {
+function estadoCom(votos) {
   return {
     modo: 'rapido',
     ordem: votos.map(([id]) => id),
     atual: 0,
     respostas: Object.fromEntries(votos),
-    importantes,
     concluido: true,
   }
 }
@@ -33,7 +32,7 @@ describe('sortearOrdem', () => {
 
   it('novoEstado começa vazio', () => {
     const e = novoEstado('rapido')
-    expect(e).toMatchObject({ atual: 0, respostas: {}, importantes: {}, concluido: false })
+    expect(e).toMatchObject({ atual: 0, respostas: {}, concluido: false })
   })
 })
 
@@ -62,15 +61,6 @@ describe('calcularResultado', () => {
     expect(calcularResultado(estadoCom([[51, -1]])).afinidade.flavio.pct).toBe(25)
   })
 
-  it('propostas importantes valem o dobro', () => {
-    const semPeso = calcularResultado(estadoCom([[1, 2], [2, -2]]))
-    const comPeso = calcularResultado(estadoCom([[1, 2], [2, -2]], { 1: true }))
-    expect(semPeso.afinidade.lula.pct).toBe(50)
-    // (2·2 − 2) / (peso 3) → (2 + 2·3) / (4·3) = 8/12 ≈ 67%
-    expect(PESO_IMPORTANTE).toBe(2)
-    expect(comPeso.afinidade.lula.pct).toBe(67)
-  })
-
   it('ignora perguntas sem resposta', () => {
     const e = estadoCom([[1, 2]])
     e.ordem.push(51)
@@ -88,8 +78,8 @@ describe('calcularResultado', () => {
   })
 
   it('separa as propostas mais apoiadas e mais rejeitadas de cada candidato', () => {
-    const r = calcularResultado(estadoCom([[1, 1], [2, 2], [3, -2], [4, 0], [5, 1]], { 5: true }))
-    expect(r.destaques.lula.concorda.map((d) => d.proposta.id)).toEqual([2, 5, 1])
+    const r = calcularResultado(estadoCom([[1, 1], [2, 2], [3, -2], [4, 0], [5, 1], [6, 1]]))
+    expect(r.destaques.lula.concorda.map((d) => d.proposta.id)).toEqual([2, 1, 5])
     expect(r.destaques.lula.discorda.map((d) => d.proposta.id)).toEqual([3])
     expect(r.destaques.flavio.concorda).toEqual([])
   })
@@ -97,12 +87,12 @@ describe('calcularResultado', () => {
 
 describe('líder por tema', () => {
   it('não aponta líder quando só um candidato tem propostas no tema', () => {
-    const r = calcularResultado(estadoCom([[23, -2]])) // só Saúde do Lula
+    const r = calcularResultado(estadoCom([[38, -2]])) // só Saúde do Lula
     expect(r.temas.find((t) => t.categoria === 'Saúde').lider).toBeNull()
   })
 
   it('aponta o líder quando os dois têm propostas no tema', () => {
-    const r = calcularResultado(estadoCom([[23, -2], [84, 1]])) // Saúde dos dois
+    const r = calcularResultado(estadoCom([[38, -2], [84, 1]])) // Saúde dos dois
     expect(r.temas.find((t) => t.categoria === 'Saúde').lider).toBe('flavio')
   })
 })

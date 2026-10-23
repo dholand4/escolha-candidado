@@ -1,7 +1,7 @@
 import { CANDIDATOS, CATEGORIAS, PROPOSTAS, PROPOSTAS_POR_ID } from '../data/propostas.js'
 
-// v2: banco de 100 propostas com novos ids; progresso salvo da v1 é descartado.
-export const STORAGE_KEY = 'match-eleitoral-2026:v2'
+// v3: banco refeito a partir dos PDFs dos planos; progresso salvo de versões anteriores é descartado.
+export const STORAGE_KEY = 'match-eleitoral-2026:v3'
 export const SIMPLES_KEY = 'match-eleitoral-2026:linguagem-simples'
 
 export const OPCOES = [
@@ -39,7 +39,7 @@ export function sortearOrdem(modo) {
 }
 
 export function novoEstado(modo) {
-  return { modo, ordem: sortearOrdem(modo), atual: 0, respostas: {}, importantes: {}, concluido: false }
+  return { modo, ordem: sortearOrdem(modo), atual: 0, respostas: {}, concluido: false }
 }
 
 export function carregarEstado() {
@@ -89,19 +89,14 @@ export function salvarPreferenciaSimples(ativo) {
   }
 }
 
-// Propostas marcadas como "importante para mim" valem o dobro no cálculo.
-export const PESO_IMPORTANTE = 2
-
 // Converte a soma de pontos em afinidade de 0 a 100%: -2 em tudo = 0%, neutro em tudo = 50%, +2 em tudo = 100%.
-// `peso` é a quantidade de respostas já multiplicada pelos pesos.
-function percentual(soma, peso) {
-  if (peso === 0) return null
-  return Math.round(((soma + 2 * peso) / (4 * peso)) * 100)
+function percentual(soma, quantidade) {
+  if (quantidade === 0) return null
+  return Math.round(((soma + 2 * quantidade) / (4 * quantidade)) * 100)
 }
 
 export function calcularResultado(estado) {
-  const importantes = estado.importantes ?? {}
-  const vazio = () => Object.fromEntries(Object.keys(CANDIDATOS).map((c) => [c, { soma: 0, peso: 0, quantidade: 0 }]))
+  const vazio = () => Object.fromEntries(Object.keys(CANDIDATOS).map((c) => [c, { soma: 0, quantidade: 0 }]))
   const geral = vazio()
   const porCategoria = Object.fromEntries(CATEGORIAS.map((cat) => [cat, vazio()]))
   const respondidas = []
@@ -110,17 +105,15 @@ export function calcularResultado(estado) {
     const voto = estado.respostas[id]
     if (voto === undefined) continue
     const proposta = PROPOSTAS_POR_ID[id]
-    const peso = importantes[id] ? PESO_IMPORTANTE : 1
-    respondidas.push({ proposta, voto, importante: Boolean(importantes[id]) })
+    respondidas.push({ proposta, voto })
     for (const alvo of [geral[proposta.candidato], porCategoria[proposta.categoria][proposta.candidato]]) {
-      alvo.soma += voto * peso
-      alvo.peso += peso
+      alvo.soma += voto
       alvo.quantidade += 1
     }
   }
 
   const afinidade = Object.fromEntries(
-    Object.keys(CANDIDATOS).map((c) => [c, { ...geral[c], pct: percentual(geral[c].soma, geral[c].peso) ?? 50 }]),
+    Object.keys(CANDIDATOS).map((c) => [c, { ...geral[c], pct: percentual(geral[c].soma, geral[c].quantidade) ?? 50 }]),
   )
 
   // Ordem de exibição: maior afinidade primeiro; em empate, ordem alfabética, para nenhum candidato
@@ -134,8 +127,8 @@ export function calcularResultado(estado) {
   const temas = CATEGORIAS.map((categoria) => {
     const candidatos = Object.fromEntries(
       ranking.map((c) => {
-        const { soma, peso, quantidade } = porCategoria[categoria][c]
-        return [c, { soma, quantidade, pct: percentual(soma, peso) }]
+        const { soma, quantidade } = porCategoria[categoria][c]
+        return [c, { soma, quantidade, pct: percentual(soma, quantidade) }]
       }),
     )
     const [a, b] = ranking.map((c) => candidatos[c].pct)
@@ -143,9 +136,8 @@ export function calcularResultado(estado) {
     return { categoria, candidatos, lider: comparavel ? ranking[a > b ? 0 : 1] : null }
   }).filter((t) => ranking.some((c) => t.candidatos[c].quantidade > 0))
 
-  // Até 3 propostas de cada candidato com que a pessoa mais concordou e que mais rejeitou;
-  // as marcadas como importantes desempatam.
-  const intensidade = (r) => Math.abs(r.voto) * 10 + (r.importante ? 1 : 0)
+  // Até 3 propostas de cada candidato com que a pessoa mais concordou e que mais rejeitou.
+  const intensidade = (r) => Math.abs(r.voto)
   const destaques = Object.fromEntries(
     ranking.map((c) => {
       const doCandidato = respondidas.filter((r) => r.proposta.candidato === c)

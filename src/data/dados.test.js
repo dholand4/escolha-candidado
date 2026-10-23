@@ -1,5 +1,6 @@
+import { existsSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { CATEGORIAS, FONTES, PROPOSTAS } from './propostas.js'
+import { CANDIDATOS, CATEGORIAS, PROPOSTAS } from './propostas.js'
 import { GLOSSARIO, marcarTermos } from './glossario.js'
 
 describe('banco de propostas', () => {
@@ -10,11 +11,18 @@ describe('banco de propostas', () => {
     expect(PROPOSTAS.filter((p) => p.candidato === 'flavio')).toHaveLength(50)
   })
 
-  it('cada proposta tem categoria válida, versão simples e fonte conhecida', () => {
+  it('cada proposta tem categoria válida, versão simples, página e trecho do plano', () => {
     for (const p of PROPOSTAS) {
       expect(CATEGORIAS, `categoria da ${p.id}`).toContain(p.categoria)
       expect(p.simples?.length, `simples da ${p.id}`).toBeGreaterThan(10)
-      if (p.fonte) expect(FONTES[p.fonte], `fonte da ${p.id}`).toBeDefined()
+      expect(Number.isInteger(p.pagina) && p.pagina > 0, `página da ${p.id}`).toBe(true)
+      for (const t of [p.trecho].flat()) expect(t?.length, `trecho da ${p.id}`).toBeGreaterThan(10)
+    }
+  })
+
+  it('os PDFs dos planos estão publicados junto com o app', () => {
+    for (const c of Object.values(CANDIDATOS)) {
+      expect(existsSync(new URL(`../../public/${c.pdf.replace('./', '')}`, import.meta.url)), c.pdf).toBe(true)
     }
   })
 

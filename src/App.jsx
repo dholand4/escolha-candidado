@@ -29,16 +29,6 @@ export default function App() {
     })
   }, [])
 
-  const alternarImportante = useCallback(() => {
-    setEstado((e) => {
-      const id = e.ordem[e.atual]
-      const importantes = { ...e.importantes }
-      if (importantes[id]) delete importantes[id]
-      else importantes[id] = true
-      return { ...e, importantes }
-    })
-  }, [])
-
   const voltar = useCallback(() => {
     setEstado((e) => (e.atual > 0 ? { ...e, atual: e.atual - 1 } : e))
   }, [])
@@ -74,7 +64,6 @@ export default function App() {
                 estado={estado}
                 restaurado={restaurado}
                 onResponder={responder}
-                onAlternarImportante={alternarImportante}
                 onVoltar={voltar}
                 onRecomecar={recomecar}
               />

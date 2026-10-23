@@ -4,7 +4,7 @@ import { PROPOSTAS } from '../data/propostas.js'
 import { MODOS } from '../lib/quiz.js'
 
 const PASSOS = [
-  { icone: EyeOff, titulo: 'Teste cego', texto: 'Os autores das propostas ficam ocultos até o final. Você avalia a ideia, não o nome.' },
+  { icone: EyeOff, titulo: 'Teste cego', texto: 'Os autores ficam ocultos até o final. Depois, o gabarito mostra de quem era cada proposta e o trecho original do plano.' },
   { icone: Scale, titulo: 'Sempre diferente', texto: `Metade das propostas é de cada candidato, sorteadas de um banco de ${PROPOSTAS.length}.` },
   { icone: Lightbulb, titulo: 'Fácil de entender', texto: 'Palavras difíceis vêm sublinhadas com explicação, e cada proposta tem versão em linguagem simples e pode ser ouvida em voz alta.' },
   { icone: HardDrive, titulo: 'Privado', texto: 'Suas respostas ficam só no seu navegador. Se fechar a aba, o progresso continua salvo, e o teste funciona até sem internet.' },

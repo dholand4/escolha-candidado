@@ -11,7 +11,6 @@ import {
   Volume2,
   RotateCcw,
   Square,
-  Star,
   ThumbsDown,
   ThumbsUp,
   X,
@@ -66,7 +65,7 @@ const estiloAcao = (ativo, cor) =>
     ativo ? cor : 'border-white/10 bg-white/5 text-slate-300 hover:bg-white/10'
   }`
 
-function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimples, importante, onAlternarImportante }) {
+function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimples }) {
   const [termo, setTermo] = useState(null)
   const { falando, alternar: alternarLeitura } = useLeitura()
   return (
@@ -150,19 +149,9 @@ function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimpl
             {falando ? 'Parar' : 'Ouvir'}
           </button>
         )}
-        <button
-          type="button"
-          onClick={onAlternarImportante}
-          aria-pressed={importante}
-          title="Propostas importantes valem o dobro no resultado"
-          className={estiloAcao(importante, 'border-yellow-300/40 bg-yellow-400/15 text-yellow-100')}
-        >
-          <Star className={`h-3.5 w-3.5 ${importante ? 'fill-yellow-300 text-yellow-300' : ''}`} />
-          {importante ? 'Importante (vale o dobro)' : 'Importante para mim'}
-        </button>
       </div>
       <p className="relative mt-3 text-[11px] text-slate-500">
-        Palavras sublinhadas têm explicação: toque nelas. Marque como importante os temas que mais pesam no seu voto.
+        Palavras sublinhadas têm explicação: toque nelas.
       </p>
 
       {respondida && (
@@ -174,7 +163,7 @@ function CartaoProposta({ proposta, numero, respondida, simples, onAlternarSimpl
   )
 }
 
-export default function Quiz({ estado, restaurado, onResponder, onAlternarImportante, onVoltar, onRecomecar }) {
+export default function Quiz({ estado, restaurado, onResponder, onVoltar, onRecomecar }) {
   const { ordem, atual, respostas, modo } = estado
   const proposta = PROPOSTAS_POR_ID[ordem[atual]]
   const respostaAtual = respostas[proposta.id]
@@ -219,13 +208,12 @@ export default function Quiz({ estado, restaurado, onResponder, onAlternarImport
     onVoltar()
   }
 
-  // Atalhos: teclas 1–5 respondem; I marca como importante; seta para a esquerda ou Backspace voltam.
+  // Atalhos: teclas 1–5 respondem; seta para a esquerda ou Backspace voltam.
   useEffect(() => {
     const aoTeclar = (ev) => {
       if (ev.metaKey || ev.ctrlKey || ev.altKey) return
       const indice = ['1', '2', '3', '4', '5'].indexOf(ev.key)
       if (indice >= 0) responder(OPCOES[indice].valor)
-      else if (ev.key === 'i' || ev.key === 'I') onAlternarImportante()
       else if (ev.key === 'ArrowLeft' || ev.key === 'Backspace') voltar()
     }
     window.addEventListener('keydown', aoTeclar)
@@ -297,8 +285,6 @@ export default function Quiz({ estado, restaurado, onResponder, onAlternarImport
               respondida={respostaAtual !== undefined}
               simples={simples}
               onAlternarSimples={alternarSimples}
-              importante={Boolean(estado.importantes?.[proposta.id])}
-              onAlternarImportante={onAlternarImportante}
             />
           </motion.article>
         </AnimatePresence>
@@ -341,7 +327,7 @@ export default function Quiz({ estado, restaurado, onResponder, onAlternarImport
         >
           <ArrowLeft className="h-4 w-4" /> Pergunta anterior
         </button>
-        <span className="hidden text-xs text-slate-500 sm:inline">Atalhos: 1–5 respondem · I importante · ← volta</span>
+        <span className="hidden text-xs text-slate-500 sm:inline">Atalhos: teclas 1–5 · ← volta</span>
       </div>
     </div>
   )

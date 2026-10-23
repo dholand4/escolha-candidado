@@ -1,7 +1,7 @@
 // Service worker do Match Eleitoral 2026: permite abrir o teste sem internet depois da primeira visita.
 // Páginas: rede primeiro (para receber atualizações), cache se estiver offline.
 // Arquivos com hash em /assets e fontes: cache primeiro.
-const CACHE = 'match-eleitoral-v1'
+const CACHE = 'match-eleitoral-v2'
 const ESSENCIAIS = ['./', './index.html', './manifest.webmanifest', './favicon.svg', './icon-192.png', './icon-512.png']
 
 self.addEventListener('install', (evento) => {
@@ -21,7 +21,8 @@ async function redePrimeiro(requisicao) {
   const cache = await caches.open(CACHE)
   try {
     const resposta = await fetch(requisicao)
-    if (resposta.ok) cache.put('./index.html', resposta.clone())
+    // Só guarda como página do app o que for HTML (abrir um PDF numa aba também é uma navegação).
+    if (resposta.ok && resposta.headers.get('content-type')?.includes('text/html')) cache.put('./index.html', resposta.clone())
     return resposta
   } catch {
     return (await cache.match('./index.html')) || Response.error()
@@ -42,7 +43,7 @@ self.addEventListener('fetch', (evento) => {
   if (request.method !== 'GET') return
   const url = new URL(request.url)
   if (url.pathname.startsWith('/_vercel/')) return
-  if (request.mode === 'navigate') {
+  if (request.mode === 'navigate' && !url.pathname.endsWith('.pdf')) {
     evento.respondWith(redePrimeiro(request))
     return
   }
