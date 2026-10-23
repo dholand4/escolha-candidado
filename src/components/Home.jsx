@@ -35,17 +35,7 @@ export default function Home({ onIniciar }) {
         </p>
       </motion.div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
-          <motion.div key={titulo} custom={i + 1} variants={item} initial="hidden" animate="show" className="glass rounded-2xl p-4">
-            <Icone className="h-5 w-5 text-cyan-300" />
-            <h2 className="mt-3 font-display text-sm font-semibold text-white">{titulo}</h2>
-            <p className="mt-1 text-sm leading-relaxed text-slate-400">{texto}</p>
-          </motion.div>
-        ))}
-      </div>
-
-      <motion.div custom={5} variants={item} initial="hidden" animate="show">
+      <motion.div custom={1} variants={item} initial="hidden" animate="show">
         <h2 className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Escolha o seu teste</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {OPCOES_MODO.map(({ id, titulo, total, icone: Icone, descricao, tempo, destaque }) => (
@@ -76,9 +66,23 @@ export default function Home({ onIniciar }) {
         </div>
       </motion.div>
 
-      <motion.p custom={6} variants={item} initial="hidden" animate="show" className="text-center text-xs text-slate-500">
-        Escala de resposta: Discordo totalmente (−2) · Discordo (−1) · Neutro (0) · Concordo (+1) · Concordo totalmente (+2)
-      </motion.p>
+      <section aria-labelledby="titulo-informacoes">
+        <motion.h2 id="titulo-informacoes" custom={2} variants={item} initial="hidden" animate="show" className="mb-3 text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+          Informações
+        </motion.h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {PASSOS.map(({ icone: Icone, titulo, texto }, i) => (
+            <motion.div key={titulo} custom={i + 3} variants={item} initial="hidden" animate="show" className="glass rounded-2xl p-4">
+              <Icone className="h-5 w-5 text-cyan-300" />
+              <h3 className="mt-3 font-display text-sm font-semibold text-white">{titulo}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-slate-400">{texto}</p>
+            </motion.div>
+          ))}
+        </div>
+        <motion.p custom={7} variants={item} initial="hidden" animate="show" className="mt-4 text-center text-xs text-slate-500">
+          Escala de resposta: Discordo totalmente (−2) · Discordo (−1) · Neutro (0) · Concordo (+1) · Concordo totalmente (+2)
+        </motion.p>
+      </section>
     </div>
   )
 }
